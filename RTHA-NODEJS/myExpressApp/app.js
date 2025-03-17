@@ -4,13 +4,19 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var swaggerUi = require('swagger-ui-express');
-var swaggerDocument = require('./swagger/swagger.json'); // Adjust the path to where your swagger.json is located
+var swaggerDocument = require('./swagger/swagger.json');
+var open = require('open').default;
+const swaggerSpecs = require('./config/swagger-config');
 
+
+// AVAILABLE PAGES ==================================
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var exampleRouter = require('./routes/example');
+var sqlTestingRouter = require('./routes/sqlTest');
+// ==================================================
 
 var app = express();
+open("http://localhost:3000/api-docs/#/default");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,10 +31,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // OpenAPI documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Main routes
+// Main routes ==================================================
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/example', exampleRouter);
+app.use('/sqlTest', sqlTestingRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
