@@ -6,24 +6,14 @@ import { FlightExportEntity } from './sqlVluchten2024export/entities/flightexpor
 import { TouchpointModule } from './sqlVluchten2024touchpoints/touchpoints.module';
 import { FlightExportModule } from './sqlVluchten2024export/flightexport.module';
 import { AppService } from './app.service';
+import { PasswordService } from './Passwords/pass';
 
+PasswordService.init([TouchpointEntity, FlightExportEntity]);
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mssql',
-      host: '77.170.251.180',
-      port: 1433,
-      username: 'Mex',
-      password: 'Mex14',
-      database: 'FlightDB',
-      entities: [TouchpointEntity, FlightExportEntity], // Add all your entities here
-      synchronize: false,  // Auto-create tables (disable in production)
-      options: {
-        encrypt: false,
-        trustServerCertificate: true
-      },
-    }),
-    TouchpointModule, FlightExportModule
+    TypeOrmModule.forRoot(PasswordService.getConfig()),
+    TouchpointModule,
+    FlightExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
