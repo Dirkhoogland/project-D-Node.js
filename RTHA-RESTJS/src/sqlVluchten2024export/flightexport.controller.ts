@@ -2,6 +2,7 @@ import { Controller, Get, Param, Res, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FlightExportService } from './flightexport.service';
 import { Response } from 'express';
+import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
 
 const controllerName = 'flightExport';
 
@@ -15,7 +16,7 @@ export class FlightExportController {
   async getFlight(
     @Param('Registration') registration: string,
     @Res() res: Response) {
-    registration = registration.trim()
+    registration = Sanitizer.removeNonAlphanumeric(registration.toUpperCase())
     var result;
     try {
       result = await this.flightExportService.findByRegistration(registration);

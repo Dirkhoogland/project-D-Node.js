@@ -11,16 +11,24 @@ export class TouchpointService {
     ) { }
 
     async findByAirlineCountryTouchpoint(airline: string, country: string, touchpoint: string): Promise<TouchpointEntity> {
-        const result = await this.touchpointRepository.createQueryBuilder('t')
-            .where('t.AirlineShortname = :airline', { airline })
-            .andWhere('t.Country = :country', { country })
-            .andWhere('t.Touchpoint = :touchpoint', { touchpoint })
-            .getMany();
+        var result;
+        try {
+            result = await this.touchpointRepository.createQueryBuilder('t')
+                .where('t.AirlineShortname = :airline', { airline })
+                .andWhere('t.Country = :country', { country })
+                .andWhere('t.Touchpoint = :touchpoint', { touchpoint })
+                .getMany();
+        }
 
-
+        catch (error) {
+            if (error.name === 'ConnectionError' || error.code === 'ETIMEOUT') {
+                throw new error('The database is unreachable. Please contact database administrators.\nFull error:\n', error);
+            }
+            else throw error;
+        }
 
         if (!result) {
-            throw new Error(`No touchpoint found for ${airline}, ${country}, ${touchpoint}`);
+            throw new Error(`No data found for ${airline}, ${country}, ${touchpoint}`);
         }
 
         return result[0];
