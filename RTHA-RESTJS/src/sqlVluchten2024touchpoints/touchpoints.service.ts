@@ -10,7 +10,7 @@ export class TouchpointService {
         private touchpointRepository: Repository<TouchpointEntity>,
     ) { }
 
-    async findByAirlineCountryTouchpoint(airline: string, country: string, touchpoint: string): Promise<TouchpointEntity> {
+    async findByAirlineCountryTouchpoint(airline: string, country: string, touchpoint: string): Promise<TouchpointEntity[]> {
         var result;
         try {
             result = await this.touchpointRepository.createQueryBuilder('t')
@@ -31,7 +31,7 @@ export class TouchpointService {
             throw new Error(`No data found for ${airline}, ${country}, ${touchpoint}`);
         }
 
-        return result[0];
+        return result;
 
     }
 }
