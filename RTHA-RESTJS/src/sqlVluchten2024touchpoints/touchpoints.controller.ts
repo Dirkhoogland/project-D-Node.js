@@ -21,9 +21,9 @@ export class TouchpointController {
     var result;
     try {
       result = await this.touchpointService.findByAirlineCountryTouchpoint(
-        Sanitizer.removeNonAlphanumeric(airline.toUpperCase()),
-        Sanitizer.removeNonAlphanumeric(country.toUpperCase()),
-        Sanitizer.removeNonAlphanumeric(touchpoint.toUpperCase()));
+        Sanitizer.removeNonAlphanumeric(airline),
+        Sanitizer.removeNonAlphanumeric(country),
+        Sanitizer.removeNonAlphanumeric(touchpoint));
 
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
