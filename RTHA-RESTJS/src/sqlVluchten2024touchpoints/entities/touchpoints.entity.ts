@@ -6,10 +6,10 @@ export class TouchpointEntity {
     id: number;
 
     @Column()
-    FlightID: string;
+    FlightID: number;
 
     @Column()
-    TimetableID: string;
+    TimetableID: number;
 
     @Column()
     FlightNumber: string;
@@ -18,7 +18,7 @@ export class TouchpointEntity {
     TrafficType: string;
 
     @Column()
-    ScheduledLocal: string;
+    ScheduledLocal: Date;
 
     @Column()
     AirlineShortname: string;
@@ -33,20 +33,20 @@ export class TouchpointEntity {
     Country: string;
 
     @Column()
-    PaxForecast: string;
+    PaxForecast: number;
 
     @Column()
     Touchpoint: string;
 
     @Column()
-    TouchpointTime: string;
+    TouchpointTime: Date;
 
     @Column()
-    TouchpointPax: string;
+    TouchpointPax: number;
 
     @Column({ nullable: true })
-    ActualLocal: string;
+    ActualLocal: Date;
 
     @Column({ nullable: true })
-    PaxActual: string;
+    PaxActual: number;
 }

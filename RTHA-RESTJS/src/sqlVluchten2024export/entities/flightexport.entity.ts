@@ -9,10 +9,10 @@ export class FlightExportEntity {
     Type: string;
 
     @Column()
-    FlightID: string;
+    FlightID: number;
 
     @Column()
-    TimetableID: string;
+    TimetableID: number;
 
     @Column()
     TrafficType: string;
@@ -21,13 +21,13 @@ export class FlightExportEntity {
     FlightNumber: string;
 
     @Column()
-    Diverted: string;
+    Diverted: boolean;
 
     @Column()
-    Nachtvlucht: string;
+    Nachtvlucht: boolean;
 
     @Column()
-    FlightCode: string;
+    FlightCode: number;
 
     @Column()
     FlightCodeDescription: string;
@@ -36,22 +36,22 @@ export class FlightExportEntity {
     FlightCodeIATA: string;
 
     @Column()
-    PublicAnnouncement: string;
+    PublicAnnouncement: boolean;
 
     @Column()
-    ScheduledUTC: string;
+    ScheduledUTC: Date;
 
     @Column()
-    ActualUTC: string;
+    ActualUTC: Date;
 
     @Column()
-    ScheduledLocal: string;
+    ScheduledLocal: Date;
 
     @Column()
-    ActualLocal: string;
+    ActualLocal: Date;
 
     @Column()
-    Bewegingen: string;
+    Bewegingen: number;
 
     @Column()
     Parkeerpositie: string;
@@ -60,13 +60,13 @@ export class FlightExportEntity {
     Parkeercontract: string;
 
     @Column()
-    Bus: string;
+    Bus: boolean;
 
     @Column()
-    Gate: string;
+    Gate: number;
 
     @Column()
-    Bagageband: string;
+    Bagageband: number;
 
     @Column()
     AirportICAO: string;
@@ -87,10 +87,10 @@ export class FlightExportEntity {
     AircraftRegistration: string;
 
     @Column()
-    Seats: string;
+    Seats: number;
 
     @Column()
-    MTOW: string;
+    MTOW: number;
 
     @Column()
     AircraftType: string;
@@ -99,10 +99,10 @@ export class FlightExportEntity {
     AircraftDescription: string;
 
     @Column()
-    EU: string;
+    EU: boolean;
 
     @Column()
-    Schengen: string;
+    Schengen: boolean;
 
     @Column()
     AirlineFullname: string;
@@ -120,61 +120,61 @@ export class FlightExportEntity {
     Debiteur: string;
 
     @Column()
-    DebiteurNr: string;
+    DebiteurNr: number;
 
     @Column()
-    PaxMale: string;
+    PaxMale: number;
 
     @Column()
-    PaxFemale: string;
+    PaxFemale: number;
 
     @Column()
-    PaxChild: string;
+    PaxChild: number;
 
     @Column()
-    PaxInfant: string;
+    PaxInfant: number;
 
     @Column()
-    PaxTransitMale: string;
+    PaxTransitMale: number;
 
     @Column()
-    PaxTransitFemale: string;
+    PaxTransitFemale: number;
 
     @Column()
-    PaxTransitChild: string;
+    PaxTransitChild: number;
 
     @Column()
-    PaxTransitInfant: string;
+    PaxTransitInfant: number;
 
     @Column()
-    CrewCabin: string;
+    CrewCabin: number;
 
     @Column()
-    CrewCockpit: string;
+    CrewCockpit: number;
 
     @Column()
-    BagsWeight: string;
+    BagsWeight: number;
 
     @Column()
-    BagsTransitWeight: string;
+    BagsTransitWeight: number;
 
     @Column()
-    Bags: string;
+    Bags: number;
 
     @Column()
-    BagsTransit: string;
+    BagsTransit: number;
 
     @Column()
     Afhandelaar: string;
 
     @Column()
-    ForecastPercentage: string;
+    ForecastPercentage: number;
 
     @Column()
-    ForecastPax: string;
+    ForecastPax: number;
 
     @Column()
-    ForecastBabys: string;
+    ForecastBabys: number;
 
     @Column()
     FlightClass: string;
@@ -183,67 +183,67 @@ export class FlightExportEntity {
     Datasource: string;
 
     @Column()
-    TotaalPax: string;
+    TotaalPax: number;
 
     @Column()
-    TerminalPax: string;
+    TerminalPax: number;
 
     @Column()
-    TotaalPaxBetalend: string;
+    TotaalPaxBetalend: number;
 
     @Column()
-    TerminalPaxBetalend: string;
+    TerminalPaxBetalend: number;
 
     @Column()
-    TransitPax: string;
+    TransitPax: number;
 
     @Column()
-    TransitPaxBetalend: string;
+    TransitPaxBetalend: number;
 
     @Column()
-    TotaalCrew: string;
+    TotaalCrew: number;
 
     @Column()
-    TerminalCrew: string;
+    TerminalCrew: number;
 
     @Column()
-    TotaalSeats: string;
+    TotaalSeats: number;
 
     @Column()
-    TerminalSeats: string;
+    TerminalSeats: number;
 
     @Column()
-    TotaalBags: string;
+    TotaalBags: number;
 
     @Column()
-    TerminalBags: string;
+    TerminalBags: number;
 
     @Column()
-    TransitBags: string;
+    TransitBags: number;
 
     @Column()
-    TotaalBagsWeight: string;
+    TotaalBagsWeight: number;
 
     @Column()
-    TerminalBagsWeight: string;
+    TerminalBagsWeight: number;
 
     @Column()
-    TransitBagsWeight: string;
+    TransitBagsWeight: number;
 
     @Column()
     Runway: string;
 
     @Column()
-    Longitude: string;
+    Longitude: number;
 
     @Column()
-    Elevation: string;
+    Elevation: number;
 
     @Column()
-    Latitude: string;
+    Latitude: number;
 
     @Column()
-    DistanceKilometers: string;
+    DistanceKilometers: number;
 
     @Column()
     Direction: string;
@@ -255,7 +255,7 @@ export class FlightExportEntity {
     Forecast: string;
 
     @Column()
-    Parked: string;
+    Parked: number;
 
     @Column()
     Seizoen: string;

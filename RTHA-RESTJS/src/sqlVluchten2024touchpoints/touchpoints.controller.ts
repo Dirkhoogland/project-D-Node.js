@@ -2,6 +2,7 @@ import { Controller, Get, Param, Res, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { TouchpointService as TouchpointService } from './touchpoints.service';
 import { Response } from 'express';
+import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
 
 const controllerName = 'touchpoints';
 
@@ -19,7 +20,10 @@ export class TouchpointController {
     @Res() res: Response) {
     var result;
     try {
-      result = await this.touchpointService.findByAirlineCountryTouchpoint(airline.trim(), country.trim(), touchpoint.trim());
+      result = await this.touchpointService.findByAirlineCountryTouchpoint(
+        Sanitizer.removeNonAlphanumeric(airline.toUpperCase()),
+        Sanitizer.removeNonAlphanumeric(country.toUpperCase()),
+        Sanitizer.removeNonAlphanumeric(touchpoint.toUpperCase()));
 
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
