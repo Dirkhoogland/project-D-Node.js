@@ -10,16 +10,16 @@ export class FlightExportService {
         private touchpointRepository: Repository<FlightExportEntity>,
     ) { }
 
-    async findByRegistration(registration: string): Promise<FlightExportEntity> {
-        const result = await this.touchpointRepository.createQueryBuilder('t')
+    async findByRegistration(registration: string): Promise<FlightExportEntity[]> {
+        const results = await this.touchpointRepository.createQueryBuilder('t')
             .where('t.AircraftRegistration = :registration', { registration })
             .getMany();
 
-        if (!result) {
+        if (!results) {
             throw new Error(`No flight found for ${registration}.`);
         }
 
-        return result[0];
+        return results;
 
     }
 }
