@@ -159,10 +159,10 @@ export class FlightExportEntity {
     BagsTransitWeight: number;
 
     @Column()
-    Bags: number;
+    BagsTransit: number;
 
     @Column()
-    BagsTransit: number;
+    Bags: number;
 
     @Column()
     Afhandelaar: string;

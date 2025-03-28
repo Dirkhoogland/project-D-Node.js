@@ -10,28 +10,17 @@ export class TouchpointService {
         private touchpointRepository: Repository<TouchpointEntity>,
     ) { }
 
-    async findByAirlineCountryTouchpoint(airline: string, country: string, touchpoint: string): Promise<TouchpointEntity[]> {
-        var result;
-        try {
-            result = await this.touchpointRepository.createQueryBuilder('t')
-                .where('t.AirlineShortname = :airline', { airline })
-                .andWhere('t.Country = :country', { country })
-                .andWhere('t.Touchpoint = :touchpoint', { touchpoint })
-                .getMany();
-        }
+    async findWithFilters(filters: Partial<TouchpointEntity>): Promise<TouchpointEntity[]> {
+        const query = this.touchpointRepository.createQueryBuilder('t');
 
-        catch (error) {
-            if (error.name === 'ConnectionError' || error.code === 'ETIMEOUT') {
-                throw new error('The database is unreachable. Please contact database administrators.\nFull error:\n', error);
+        // Dynamisch filters toevoegen
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.andWhere(`t.${key} = :${key}`, { [key]: value });
             }
-            else throw error;
-        }
+        });
 
-        if (!result) {
-            throw new Error(`No data found for ${airline}, ${country}, ${touchpoint}`);
-        }
-
-        return result;
-
+        // Limiteer om performance te beschermen
+        return await query.limit(10).getMany();
     }
 }

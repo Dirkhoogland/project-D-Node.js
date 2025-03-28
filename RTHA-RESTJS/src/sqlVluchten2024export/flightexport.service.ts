@@ -7,19 +7,18 @@ import { FlightExportEntity } from './entities/flightexport.entity';
 export class FlightExportService {
     constructor(
         @InjectRepository(FlightExportEntity)
-        private touchpointRepository: Repository<FlightExportEntity>,
+        private flightExportRepository: Repository<FlightExportEntity>,
     ) { }
 
-    async findByRegistration(registration: string): Promise<FlightExportEntity[]> {
-        const results = await this.touchpointRepository.createQueryBuilder('t')
-            .where('t.AircraftRegistration = :registration', { registration })
-            .getMany();
+    async findWithFilters(filters: Partial<FlightExportEntity>): Promise<FlightExportEntity[]> {
+        const query = this.flightExportRepository.createQueryBuilder('f');
 
-        if (!results) {
-            throw new Error(`No flight found for ${registration}.`);
-        }
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.andWhere(`f.${key} = :${key}`, { [key]: value });
+            }
+        });
 
-        return results;
-
+        return await query.limit(10).getMany();
     }
 }
