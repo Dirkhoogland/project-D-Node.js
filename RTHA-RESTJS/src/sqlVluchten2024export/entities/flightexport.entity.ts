@@ -1,7 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity('Vluchten2024export')
 export class FlightExportEntity {
+    @Exclude()
     @PrimaryGeneratedColumn()
     id: number;
 

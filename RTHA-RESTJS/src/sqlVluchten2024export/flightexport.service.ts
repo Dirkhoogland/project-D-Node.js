@@ -10,7 +10,11 @@ export class FlightExportService {
         private flightExportRepository: Repository<FlightExportEntity>,
     ) { }
 
-    async findWithFilters(filters: Partial<FlightExportEntity>): Promise<FlightExportEntity[]> {
+    async findWithFilters(
+        filters: Partial<FlightExportEntity>,
+        limit = 50,
+        offset = 0,
+    ): Promise<{ data: FlightExportEntity[]; total: number }> {
         const query = this.flightExportRepository.createQueryBuilder('f');
 
         Object.entries(filters).forEach(([key, value]) => {
@@ -19,6 +23,16 @@ export class FlightExportService {
             }
         });
 
-        return await query.limit(10).getMany();
+        const [data, total] = await query
+            .orderBy('f.id', 'ASC') // voor stabiele paginering
+            .skip(offset)
+            .take(limit)
+            .getManyAndCount();
+
+        return { data, total };
+    }
+
+    async findOneById(FlightID: number): Promise<FlightExportEntity | null> {
+        return await this.flightExportRepository.findOne({ where: { FlightID } });
     }
 }
