@@ -1,7 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FlightExportQueryDto {
-    @ApiPropertyOptional() id?: number;
     @ApiPropertyOptional() Type?: string;
     @ApiPropertyOptional() FlightID?: number;
     @ApiPropertyOptional() TimetableID?: number;
@@ -88,4 +87,6 @@ export class FlightExportQueryDto {
     @ApiPropertyOptional() Parked?: number;
     @ApiPropertyOptional() Seizoen?: string;
     @ApiPropertyOptional() Feestdag?: string;
+    @ApiPropertyOptional({ description: 'Aantal resultaten per pagina' }) limit?: number;
+    @ApiPropertyOptional({ description: 'Aantal over te slaan resultaten (offset)' }) offset?: number;
 }

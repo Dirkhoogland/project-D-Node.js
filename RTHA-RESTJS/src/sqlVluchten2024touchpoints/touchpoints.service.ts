@@ -10,17 +10,29 @@ export class TouchpointService {
         private touchpointRepository: Repository<TouchpointEntity>,
     ) { }
 
-    async findWithFilters(filters: Partial<TouchpointEntity>): Promise<TouchpointEntity[]> {
+    async findWithFilters(
+        filters: Partial<TouchpointEntity>,
+        limit = 50,
+        offset = 0,
+    ): Promise<{ data: TouchpointEntity[]; total: number }> {
         const query = this.touchpointRepository.createQueryBuilder('t');
 
-        // Dynamisch filters toevoegen
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null && value !== '') {
                 query.andWhere(`t.${key} = :${key}`, { [key]: value });
             }
         });
 
-        // Limiteer om performance te beschermen
-        return await query.limit(10).getMany();
+        const [data, total] = await query
+            .orderBy('t.id', 'ASC')
+            .skip(offset)
+            .take(limit)
+            .getManyAndCount();
+
+        return { data, total };
+    }
+
+    async findOneById(FlightID: number): Promise<TouchpointEntity | null> {
+        return await this.touchpointRepository.findOne({ where: { FlightID } });
     }
 }
