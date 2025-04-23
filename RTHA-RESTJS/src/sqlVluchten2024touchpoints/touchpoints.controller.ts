@@ -1,26 +1,31 @@
-import { Controller, Get, Query, Res, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Query, HttpStatus, UseGuards, NotFoundException, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { TouchpointService } from './touchpoints.service';
-import { Response } from 'express';
-import { TouchpointQueryDto } from './dto/touchpoint-query.dto'; // <-- pad aanpassen als nodig
+import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
+import { AuthGuard } from '@nestjs/passport';
 
 const controllerName = 'touchpoints';
 
 @ApiTags('RTHA-API')
 @Controller(controllerName)
 export class TouchpointController {
-  constructor(private readonly touchpointService: TouchpointService) { }
+  constructor(private readonly touchpointService: TouchpointService) {}
 
-  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('protected')
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with flexible filters',
     description: 'Returns filtered data from SQL "Touchpoints" database.',
   })
   async getFilteredTouchpoints(
     @Query() query: TouchpointQueryDto,
-    @Res() res: Response,
+    @Request() req, // Added to access user info from the token if needed
   ) {
+    const user = req.user; // Access authenticated user (optional)
+    console.log('Authenticated user:', user); // Debug line to check user details
+
     const sanitizedFilters = Object.fromEntries(
       Object.entries(query).map(([key, value]) => [
         key,
@@ -32,13 +37,10 @@ export class TouchpointController {
       const result = await this.touchpointService.findWithFilters(sanitizedFilters);
 
       if (!result || result.length === 0) {
-        return res.status(HttpStatus.NOT_FOUND).json({
-          status_code: HttpStatus.NOT_FOUND,
-          message: `No data found with provided filters.`,
-        });
+        throw new NotFoundException('No data found with provided filters.');
       }
 
-      return res.status(HttpStatus.OK).json({
+      return {
         status: HttpStatus.OK,
         message: 'Success!',
         name: 'RTHA-TOUCHPOINTS-API',
@@ -46,12 +48,10 @@ export class TouchpointController {
         query,
         url: `http://localhost:3000/${controllerName}?...`,
         data: result,
-      });
+      };
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `The server has encountered a problem.`,
-      });
+      // NestJS will handle any errors, so no need to manually set status codes
+      throw new Error('The server has encountered a problem.');
     }
   }
 }
