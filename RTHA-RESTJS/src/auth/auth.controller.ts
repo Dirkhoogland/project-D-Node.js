@@ -8,7 +8,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('Get Token')
+  @Post('Login')
   async login(@Body() loginDto: LoginDto) {
     const { username, password } = loginDto;
 
