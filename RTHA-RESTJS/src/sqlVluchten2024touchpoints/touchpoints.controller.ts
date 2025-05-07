@@ -1,9 +1,25 @@
-import { Controller, Get, Query, HttpStatus, UseGuards, NotFoundException, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Res,
+  HttpStatus,
+  UseGuards,
+  NotFoundException,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Response } from 'express';
+import { instanceToPlain } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
 import { TouchpointService } from './touchpoints.service';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
-import { AuthGuard } from '@nestjs/passport';
 
 const controllerName = 'touchpoints';
 
@@ -16,42 +32,107 @@ export class TouchpointController {
   @ApiBearerAuth('jwt')
   @Get('protected')
   @ApiOperation({
-    summary: 'Query SQL-Touchpoints database with flexible filters',
-    description: 'Returns filtered data from SQL "Touchpoints" database.',
+    summary: 'Query SQL-Touchpoints database with filters and pagination',
+    description: 'Returns paginated and filtered touchpoint data.',
   })
   async getFilteredTouchpoints(
     @Query() query: TouchpointQueryDto,
-    @Request() req, // Added to access user info from the token if needed
+    @Request() req,
+    @Res() res: Response,
   ) {
-    const user = req.user; // Access authenticated user (optional)
-    console.log('Authenticated user:', user); // Debug line to check user details
+    const user = req.user;
+    console.log('Authenticated user:', user);
 
     const sanitizedFilters = Object.fromEntries(
       Object.entries(query).map(([key, value]) => [
         key,
-        typeof value === 'string' ? Sanitizer.removeNonAlphanumeric(value) : value,
+        typeof value === 'string'
+          ? Sanitizer.removeNonAlphanumeric(value)
+          : value,
       ]),
     );
 
-    try {
-      const result = await this.touchpointService.findWithFilters(sanitizedFilters);
+    const limit = Number(sanitizedFilters.limit ?? 50);
+    const offset = Number(sanitizedFilters.offset ?? 0);
+    const { limit: _, offset: __, ...filters } = sanitizedFilters;
 
-      if (!result || result.length === 0) {
-        throw new NotFoundException('No data found with provided filters.');
+    try {
+      const { data, total } = await this.touchpointService.findWithFilters(
+        filters,
+        limit,
+        offset,
+      );
+
+      if (!data || data.length === 0) {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          status_code: HttpStatus.NOT_FOUND,
+          message: `No data found with provided filters.`,
+        });
       }
 
-      return {
+      const nextOffset = offset + limit;
+      const hasNextPage = nextOffset < total;
+
+      const queryParams = new URLSearchParams({
+        ...Object.entries(query).reduce((acc, [key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            acc[key] = String(value);
+          }
+          return acc;
+        }, {} as Record<string, string>),
+        limit: String(limit),
+        offset: String(nextOffset),
+      });
+
+      const nextPageUrl = hasNextPage
+        ? `http://localhost:3000/${controllerName}?${queryParams.toString()}`
+        : null;
+
+      const plainList = data.map((item) => instanceToPlain(item));
+
+      return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
         message: 'Success!',
         name: 'RTHA-TOUCHPOINTS-API',
         format: 'JSON',
-        query,
-        url: `http://localhost:3000/${controllerName}?...`,
-        data: result,
-      };
+        total,
+        count: plainList.length,
+        nextPage: nextPageUrl,
+        data: plainList,
+      });
     } catch (error) {
-      // NestJS will handle any errors, so no need to manually set status codes
       throw new Error('The server has encountered a problem.');
     }
+  }
+
+  @Get(':FlightID')
+  @ApiOperation({
+    summary: 'Get single touchpoint by FlightID',
+    description: 'Returns a single row from SQL Touchpoints by FlightID',
+  })
+  async getById(@Param('FlightID') FlightID: string, @Res() res: Response) {
+    const numericId = parseInt(FlightID, 10);
+    if (isNaN(numericId)) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Invalid ID provided.',
+      });
+    }
+
+    const result = await this.touchpointService.findOneById(numericId);
+    if (!result) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        status_code: HttpStatus.NOT_FOUND,
+        message: `Touchpoint with ID ${FlightID} not found.`,
+      });
+    }
+
+    const plain = instanceToPlain(result);
+
+    return res.status(HttpStatus.OK).json({
+      status: HttpStatus.OK,
+      message: 'Touchpoint found!',
+      data: plain,
+    });
   }
 }
