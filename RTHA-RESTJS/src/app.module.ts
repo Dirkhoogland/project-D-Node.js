@@ -7,6 +7,7 @@ import { TouchpointModule } from './sqlVluchten2024touchpoints/touchpoints.modul
 import { FlightExportModule } from './sqlVluchten2024export/flightexport.module';
 import { AppService } from './app.service';
 import { PasswordService } from './Passwords/pass';
+import { AuthModule } from './auth/auth.module';
 
 PasswordService.init([TouchpointEntity, FlightExportEntity]);
 @Module({
@@ -14,6 +15,7 @@ PasswordService.init([TouchpointEntity, FlightExportEntity]);
     TypeOrmModule.forRoot(PasswordService.getConfig()),
     TouchpointModule,
     FlightExportModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

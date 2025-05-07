@@ -5,30 +5,44 @@ import {
   Param,
   Res,
   HttpStatus,
+  UseGuards,
+  NotFoundException,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { TouchpointService } from './touchpoints.service';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Response } from 'express';
+import { instanceToPlain } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
+import { TouchpointService } from './touchpoints.service';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
-import { instanceToPlain } from 'class-transformer';
 
 const controllerName = 'touchpoints';
 
 @ApiTags('RTHA-API')
 @Controller(controllerName)
 export class TouchpointController {
-  constructor(private readonly touchpointService: TouchpointService) { }
+  constructor(private readonly touchpointService: TouchpointService) {}
 
-  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('protected')
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
     description: 'Returns paginated and filtered touchpoint data.',
   })
   async getFilteredTouchpoints(
     @Query() query: TouchpointQueryDto,
+    @Request() req,
     @Res() res: Response,
   ) {
+    const user = req.user;
+    console.log('Authenticated user:', user);
+
     const sanitizedFilters = Object.fromEntries(
       Object.entries(query).map(([key, value]) => [
         key,
@@ -87,10 +101,7 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `The server has encountered a problem.`,
-      });
+      throw new Error('The server has encountered a problem.');
     }
   }
 
