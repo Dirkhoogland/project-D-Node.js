@@ -1,22 +1,31 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; // adjust path if needed
 import { ApiTags } from '@nestjs/swagger';
+import * as bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 
 @ApiTags('auth') // Adds Swagger tag for grouping
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('Login')
+  @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const { username, password } = loginDto;
 
-    // Fake login logic (replace with real user check)
-    if (username === 'admin' && password === 'admin') {
-      return this.authService.login({ id: 1, username });
+    // Check if the user exists in the database
+    const user = await this.authService.findUserByUsername(username);
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    return { message: 'Invalid credentials' };
+    // Validate the password using bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+    if (!isPasswordValid) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    // Generate and return a JWT token
+    return this.authService.login({ Username: user.Username, Password: password });
   }
-}
+} 
