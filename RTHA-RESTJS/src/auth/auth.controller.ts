@@ -3,11 +3,12 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; // adjust path if needed
 import { ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt'; // Import bcrypt for password hashing
+import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('auth') // Adds Swagger tag for grouping
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
@@ -26,6 +27,12 @@ export class AuthController {
     }
 
     // Generate and return a JWT token
-    return this.authService.login({ Username: user.Username, Password: password });
+    return this.authService.login({ username: user.Username });
+  }
+
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    await this.authService.register(registerDto.username, registerDto.password);
+    return { message: 'User registered successfully' };
   }
 } 

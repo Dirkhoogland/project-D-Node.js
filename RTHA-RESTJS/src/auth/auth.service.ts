@@ -12,15 +12,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(PasswordUsername)
     private readonly passwordUsernameRepository: Repository<PasswordUsername>,
-  ) {}
+  ) { }
 
-  async findUserByUsername(Username: string): Promise<{Username: string; hashedPassword: string } | null> {
+  async findUserByUsername(Username: string): Promise<{ Username: string; hashedPassword: string } | null> {
     const user = await this.passwordUsernameRepository.findOne({ where: { Username } });
     if (!user) {
       return null;
     }
-    const bcrypt = require('bcrypt');
-    bcrypt.hash('Admin', 10).then(console.log);
     return {
       Username: user.Username,
       hashedPassword: user.Password,
@@ -41,7 +39,13 @@ export class AuthService {
     return bcrypt.compare(password, user.hashedPassword);
   }
 
-  login(payload: { Username: string; Password: string }) {
-    return this.jwtService.sign(payload);
+  login(user: { username: string }) {
+    return this.jwtService.sign({
+      username: user.username,
+    });
   }
+
+
 }
+
+
