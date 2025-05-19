@@ -10,6 +10,9 @@ import { AppService } from './app.service';
 import { PasswordService } from './Passwords/pass';
 import { AuthModule } from './auth/auth.module';
 import { UserLogEntity } from './sqlVluchten2024touchpoints/entities/userlog.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 
 PasswordService.init([TouchpointEntity, FlightExportEntity, UserLogEntity, PasswordUsername]);
 @Module({
@@ -20,7 +23,11 @@ PasswordService.init([TouchpointEntity, FlightExportEntity, UserLogEntity, Passw
     }),
     TouchpointModule,
     FlightExportModule,
-    AuthModule
+    AuthModule,
+    ServeStaticModule.forRoot({
+      rootPath: join('src/app.module.ts', '..', 'userstatspage'),
+      serveRoot: '/userstats',
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

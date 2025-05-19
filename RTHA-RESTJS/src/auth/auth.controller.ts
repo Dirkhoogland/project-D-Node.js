@@ -1,7 +1,7 @@
 import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; // adjust path if needed
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 import { RegisterDto } from './dto/register.dto';
 
@@ -11,6 +11,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('login')
+  @ApiBody({ type: LoginDto })
   async login(@Body() loginDto: LoginDto) {
     const { username, password } = loginDto;
 
@@ -31,6 +32,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @ApiBody({ type: RegisterDto })
   async register(@Body() registerDto: RegisterDto) {
     await this.authService.register(registerDto.username, registerDto.password);
     return { message: 'User registered successfully' };
