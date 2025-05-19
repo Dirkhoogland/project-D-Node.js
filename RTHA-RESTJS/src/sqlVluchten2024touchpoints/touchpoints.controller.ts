@@ -5,13 +5,22 @@ import {
   Param,
   Res,
   HttpStatus,
+  UseGuards,
+  NotFoundException,
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { TouchpointService } from './touchpoints.service';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Response } from 'express';
+import { instanceToPlain } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
+import { TouchpointService } from './touchpoints.service';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
-import { instanceToPlain } from 'class-transformer';
+import { JsonWebTokenError } from '@nestjs/jwt';
 
 const controllerName = 'touchpoints';
 
@@ -20,15 +29,22 @@ const controllerName = 'touchpoints';
 export class TouchpointController {
   constructor(private readonly touchpointService: TouchpointService) { }
 
-  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+
+  @Get('protected')
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
     description: 'Returns paginated and filtered touchpoint data.',
   })
   async getFilteredTouchpoints(
     @Query() query: TouchpointQueryDto,
+    @Request() req,
     @Res() res: Response,
   ) {
+    const user = req.user;
+    console.log('Authenticated user:', user.username);
+
     const sanitizedFilters = Object.fromEntries(
       Object.entries(query).map(([key, value]) => [
         key,
@@ -42,12 +58,19 @@ export class TouchpointController {
     const offset = Number(sanitizedFilters.offset ?? 0);
     const { limit: _, offset: __, ...filters } = sanitizedFilters;
 
+
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
         filters,
         limit,
         offset,
       );
+
+      // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      const resultFound = data && data.length > 0;
+      await this.touchpointService.logUser(user.username, 'Touchpoints', queryAsString, fullUrl, resultFound);
 
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
@@ -87,10 +110,12 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `The server has encountered a problem.`,
-      });
+      if (error instanceof JsonWebTokenError) {
+        throw new Error(error.message)
+      }
+      else {
+        throw new Error('The server has encountered a problem: ' + error.message);
+      }
     }
   }
 
