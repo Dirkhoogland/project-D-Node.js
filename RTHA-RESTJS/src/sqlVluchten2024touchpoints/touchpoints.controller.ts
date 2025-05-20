@@ -20,6 +20,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TouchpointService } from './touchpoints.service';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
+import { JsonWebTokenError } from '@nestjs/jwt';
 
 const controllerName = 'touchpoints';
 
@@ -30,6 +31,7 @@ export class TouchpointController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
+
   @Get('protected')
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
@@ -41,7 +43,7 @@ export class TouchpointController {
     @Res() res: Response,
   ) {
     const user = req.user;
-    console.log('Authenticated user:', user);
+    console.log('Authenticated user:', user.username);
 
 
     //Cleaning up the query by removing any unwanted characters with Sanitizer
@@ -63,6 +65,7 @@ export class TouchpointController {
     const { limit: _, offset: __, ...filters } = sanitizedFilters;
 
 
+
     //Tries to use FindWithFilters (this is a method from touchpoints.service.ts) and gives it the filters (the query), limit and offset
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
@@ -71,7 +74,13 @@ export class TouchpointController {
         offset,
       );
 
-      //Checks if what findWithFilters returned is not empty/null, if it is we give return that nothing was found this the provided filters
+      // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      const resultFound = data && data.length > 0;
+      await this.touchpointService.logUser(user.username, 'Touchpoints', queryAsString, fullUrl, resultFound);
+
+
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
           status_code: HttpStatus.NOT_FOUND,
@@ -116,7 +125,12 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
-      throw new Error('The server has encountered a problem.');
+      if (error instanceof JsonWebTokenError) {
+        throw new Error(error.message)
+      }
+      else {
+        throw new Error('The server has encountered a problem: ' + error.message);
+      }
     }
   }
 

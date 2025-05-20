@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FlightExportEntity } from './entities/flightexport.entity';
+import { UserLogEntity } from 'src/sqlVluchten2024touchpoints/entities/userlog.entity';
 
 @Injectable()
 export class FlightExportService {
     constructor(
         @InjectRepository(FlightExportEntity)
         private flightExportRepository: Repository<FlightExportEntity>,
+        @InjectRepository(UserLogEntity)
+        private userLogRepository: Repository<UserLogEntity>,
     ) { }
 
     //Here we find the data in the database with the given query parameters (known here as 'filters')
@@ -41,5 +44,21 @@ export class FlightExportService {
     //Here we simply search the database for the first row that has a identical FlightID
     async findOneById(FlightID: number): Promise<FlightExportEntity | null> {
         return await this.flightExportRepository.findOne({ where: { FlightID } });
+    }
+
+    async logUser(username: string, database: string, query: string, requestUrl: string, resultFound = false): Promise<void> {
+        if (username === null || username === undefined) {
+            console.log('Username can not be null or undefined.');
+            return;
+        }
+        const logEntry = this.userLogRepository.create({
+            username,
+            database,
+            query,
+            requestUrl,
+            resultFound,
+        });
+        await this.userLogRepository.save(logEntry);
+        console.log(`Logged user: ${username} on database: ${database}`);
     }
 }
