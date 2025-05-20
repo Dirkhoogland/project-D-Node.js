@@ -49,14 +49,6 @@ export class FlightExportController {
         offset,
       );
 
-      // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
-
-      // ============== UNCOMMENT ================
-      // const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-      // const queryAsString = JSON.stringify(query);
-      // const resultFound = data && data.length > 0;
-      // await this.touchpointService.logUser(user.username, 'Export', queryAsString, fullUrl, resultFound);
-
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
           status_code: HttpStatus.NOT_FOUND,
