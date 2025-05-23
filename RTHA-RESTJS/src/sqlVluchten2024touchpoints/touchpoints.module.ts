@@ -8,5 +8,6 @@ import { UserLogEntity } from './entities/userlog.entity';
     imports: [TypeOrmModule.forFeature([TouchpointEntity, UserLogEntity])],
     controllers: [TouchpointController],
     providers: [TouchpointService],
+    exports: [TouchpointService],
 })
 export class TouchpointModule { }

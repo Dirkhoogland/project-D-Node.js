@@ -4,6 +4,13 @@ import { LoginDto } from './dto/login.dto'; // adjust path if needed
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 import { RegisterDto } from './dto/register.dto';
+import { Role } from './Roles/role.enum'; // Adjust the import path as necessary
+import { Roles } from './Roles/role.decorator'
+import { RolesGuard } from './Roles/role.guard';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
+
 
 @ApiTags('auth') // Adds Swagger tag for grouping
 @Controller('auth')
@@ -28,13 +35,16 @@ export class AuthController {
     }
 
     // Generate and return a JWT token
-    return this.authService.login({ username: user.Username });
+    return this.authService.login({ Username: user.Username, Role: user.Role });
   }
 
-  @Post('register')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Post('protected/register')
+  @ApiBearerAuth('jwt')
+  @Roles(Role.MODERATOR)
   @ApiBody({ type: RegisterDto })
   async register(@Body() registerDto: RegisterDto) {
-    await this.authService.register(registerDto.username, registerDto.password);
+    await this.authService.register(registerDto);
     return { message: 'User registered successfully' };
   }
 } 

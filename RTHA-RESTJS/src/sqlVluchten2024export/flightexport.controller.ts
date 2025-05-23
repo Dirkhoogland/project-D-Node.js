@@ -5,6 +5,7 @@ import {
   Param,
   Res,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FlightExportService } from './flightexport.service';
@@ -12,15 +13,25 @@ import { Response } from 'express';
 import { FlightExportQueryDto } from './dto/flightexport-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
 import { instanceToPlain } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { TouchpointService } from 'src/sqlVluchten2024touchpoints/touchpoints.service';
+import { Request } from 'express';
+import { Req } from '@nestjs/common'
 
 const controllerName = 'flightExport';
 
 @ApiTags('RTHA-API')
 @Controller(controllerName)
 export class FlightExportController {
-  constructor(private readonly flightExportService: FlightExportService) { }
+  constructor(
+    private readonly flightExportService: FlightExportService,
+    private readonly touchpointService: TouchpointService,
+    ) { }
 
-  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('protected')
   @ApiOperation({
     summary: 'Query SQL-Export database with flexible filters + pagination',
     description: 'Returns filtered data from SQL "Export" database.',
@@ -28,6 +39,7 @@ export class FlightExportController {
   async getFilteredFlights(
     @Query() query: FlightExportQueryDto,
     @Res() res: Response,
+    @Req() req: Request,
   ) {
     //Cleaning up the query by removing any unwanted characters with Sanitizer
     const sanitizedFilters = Object.fromEntries(
@@ -59,10 +71,10 @@ export class FlightExportController {
       // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
 
       // ============== UNCOMMENT ================
-      // const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-      // const queryAsString = JSON.stringify(query);
-      // const resultFound = data && data.length > 0;
-      // await this.touchpointService.logUser(user.username, 'Export', queryAsString, fullUrl, resultFound);
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      const resultFound = data && data.length > 0;
+      await this.touchpointService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound);
 
       //Checks if what findWithFilters returned is not empty/null, if it is we give return that nothing was found this the provided filters
 
@@ -122,7 +134,9 @@ export class FlightExportController {
     }
   }
 
-  @Get(':FlightID')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('protected/:FlightID')
   @ApiOperation({
     summary: 'Get a single flight export by FlightID',
     description: 'Returns one record from SQL "Export" database by FlightID.',
