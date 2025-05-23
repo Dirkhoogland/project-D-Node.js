@@ -134,7 +134,9 @@ export class TouchpointController {
     }
   }
 
-  @Get(':FlightID')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('protected/:FlightID')
   @ApiOperation({
     summary: 'Get single touchpoint by FlightID',
     description: 'Returns a single row from SQL Touchpoints by FlightID',
