@@ -27,7 +27,7 @@ export class FlightExportController {
   constructor(
     private readonly flightExportService: FlightExportService,
     private readonly touchpointService: TouchpointService,
-    ) { }
+  ) { }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
@@ -50,9 +50,16 @@ export class FlightExportController {
       ]),
     );
 
-    const limit = Number(sanitizedFilters.limit ?? 50);
-    const offset = Number(sanitizedFilters.offset ?? 0);
-    const { limit: _, offset: __, ...filters } = sanitizedFilters;
+    const { limit: rawLimit, offset: rawOffset, ...rawFilters } = sanitizedFilters;
+
+    const limit = Number.isNaN(Number(rawLimit)) ? 50 : Number(rawLimit);
+    const offset = Number.isNaN(Number(rawOffset)) ? 0 : Number(rawOffset);
+
+    const filters = Object.fromEntries(
+      Object.entries(rawFilters).filter(
+        ([_, value]) => value !== undefined && value !== null && value !== '',
+      ),
+    );
 
     const isEmpty = Object.keys(filters).length === 0;
 
