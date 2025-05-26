@@ -1,6 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
-    IsOptional,
     IsString,
     IsNumber,
     IsBoolean,
@@ -9,270 +8,354 @@ import {
 
 export class FlightExportQueryDto {
     @ApiPropertyOptional()
-    @IsOptional()
     @IsString()
     Type?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     FlightID?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TimetableID?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     TrafficType?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     FlightNumber?: string;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     Diverted?: boolean;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     Nachtvlucht?: boolean;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     FlightCode?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     FlightCodeDescription?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     FlightCodeIATA?: string;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     PublicAnnouncement?: boolean;
 
-    @IsOptional() @IsDateString()
+    @ApiPropertyOptional()
+    @IsDateString()
     ScheduledUTC?: string;
 
-    @IsOptional() @IsDateString()
+    @ApiPropertyOptional()
+    @IsDateString()
     ActualUTC?: string;
 
-    @IsOptional() @IsDateString()
+    @ApiPropertyOptional()
+    @IsDateString()
     ScheduledLocal?: string;
 
-    @IsOptional() @IsDateString()
+    @ApiPropertyOptional()
+    @IsDateString()
     ActualLocal?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Bewegingen?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Parkeerpositie?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Parkeercontract?: string;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     Bus?: boolean;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Gate?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Bagageband?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirportICAO?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Airport?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Country?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     ViaAirportICAO?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     ViaAirport?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AircraftRegistration?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Seats?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     MTOW?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AircraftType?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AircraftDescription?: string;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     EU?: boolean;
 
-    @IsOptional() @IsBoolean()
+    @ApiPropertyOptional()
+    @IsBoolean()
     Schengen?: boolean;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirlineFullname?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirlineShortname?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirlineICAO?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirlineIATA?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Debiteur?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     DebiteurNr?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxMale?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxFemale?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxChild?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxInfant?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxTransitMale?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxTransitFemale?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxTransitChild?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     PaxTransitInfant?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     CrewCabin?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     CrewCockpit?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     BagsWeight?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     BagsTransitWeight?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     BagsTransit?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Bags?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Afhandelaar?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     ForecastPercentage?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     ForecastPax?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     ForecastBabys?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     FlightClass?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Datasource?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalPax?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalPax?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalPaxBetalend?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalPaxBetalend?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TransitPax?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TransitPaxBetalend?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalCrew?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalCrew?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalSeats?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalSeats?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalBags?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalBags?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TransitBags?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TotaalBagsWeight?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TerminalBagsWeight?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     TransitBagsWeight?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Runway?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Longitude?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Elevation?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Latitude?: number;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     DistanceKilometers?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Direction?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     AirportIATA?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Forecast?: string;
 
-    @IsOptional() @IsNumber()
+    @ApiPropertyOptional()
+    @IsNumber()
     Parked?: number;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Seizoen?: string;
 
-    @IsOptional() @IsString()
+    @ApiPropertyOptional()
+    @IsString()
     Feestdag?: string;
 
-    @IsOptional()
+    @ApiPropertyOptional()
     @IsNumber()
     limit?: number;
 
-    @IsOptional()
+    @ApiPropertyOptional()
     @IsNumber()
     offset?: number;
 }
