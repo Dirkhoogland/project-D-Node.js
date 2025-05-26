@@ -41,6 +41,29 @@ export class FlightExportService {
         return { data, total };
     }
 
+    async getAllFlightIDs(limit = 50, offset = 0): Promise<{ flightIDs: number[]; total: number }> {
+        const query = this.flightExportRepository
+            .createQueryBuilder('f')
+            .select('f.FlightID')
+            .distinct(true)
+            .orderBy('f.FlightID', 'ASC')
+            .skip(offset)
+            .take(limit);
+
+        const [results, total] = await Promise.all([
+            query.getRawMany(), // paginated data
+            this.flightExportRepository
+                .createQueryBuilder('f')
+                .select('COUNT(DISTINCT f.FlightID)', 'count')
+                .getRawOne()
+                .then(res => Number(res.count)),
+        ]);
+
+        const flightIDs = results.map((row) => row.f_FlightID);
+        return { flightIDs, total };
+    }
+
+
     //Here we simply search the database for the first row that has a identical FlightID
     async findOneById(FlightID: number): Promise<FlightExportEntity | null> {
         return await this.flightExportRepository.findOne({ where: { FlightID } });
