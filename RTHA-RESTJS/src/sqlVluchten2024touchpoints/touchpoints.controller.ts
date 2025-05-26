@@ -32,7 +32,7 @@ export class TouchpointController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
 
-  @Get('protected')
+  @Get()
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
     description: 'Returns paginated and filtered touchpoint data.',
@@ -153,7 +153,7 @@ export class TouchpointController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
-  @Get('protected/:FlightID')
+  @Get('FlightID')
   @ApiOperation({
     summary: 'Get single touchpoint by FlightID',
     description: 'Returns a single row from SQL Touchpoints by FlightID',

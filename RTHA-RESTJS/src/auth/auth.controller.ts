@@ -39,7 +39,7 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Post('protected/register')
+  @Post('register')
   @ApiBearerAuth('jwt')
   @Roles(Role.MODERATOR)
   @ApiBody({ type: RegisterDto })

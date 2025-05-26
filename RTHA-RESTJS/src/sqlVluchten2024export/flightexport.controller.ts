@@ -31,7 +31,7 @@ export class FlightExportController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
-  @Get('protected')
+  @Get()
   @ApiOperation({
     summary: 'Query SQL-Export database with flexible filters + pagination',
     description: 'Returns filtered data from SQL "Export" database.',
@@ -149,7 +149,7 @@ export class FlightExportController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
-  @Get('protected/:FlightID')
+  @Get('FlightID')
   @ApiOperation({
     summary: 'Get a single flight export by FlightID',
     description: 'Returns one record from SQL "Export" database by FlightID.',
