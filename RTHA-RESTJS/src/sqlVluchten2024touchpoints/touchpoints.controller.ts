@@ -88,8 +88,6 @@ export class TouchpointController {
 
 
 
-    //Tries to use FindWithFilters (this is a method from touchpoints.service.ts) and gives it the filters (the query), limit and offset
-
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
         filters,
@@ -98,7 +96,6 @@ export class TouchpointController {
       );
 
 
-      // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
       const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
       const queryAsString = JSON.stringify(query);
       const resultFound = data && data.length > 0;
