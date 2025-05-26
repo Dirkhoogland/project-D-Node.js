@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FlightExportService } from './flightexport.service';
 import { FlightExportEntity } from './entities/flightexport.entity';
+import { ExportLogEntity } from './entities/exportlog.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -17,6 +18,13 @@ describe('FlightExportService', () => {
                     useValue: {
                         createQueryBuilder: jest.fn(),
                         findOne: jest.fn(),
+                    },
+                },
+                {
+                    provide: getRepositoryToken(ExportLogEntity),
+                    useValue: {
+                        create: jest.fn(),
+                        save: jest.fn(),
                     },
                 },
             ],
