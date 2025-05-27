@@ -185,7 +185,6 @@ describe('FlightExportService', () => {
 
             const result = await service.findWithFilters(filters, 20, 0);
 
-            // Check dat andWhere is aangeroepen met elk filter
             expect(mockQueryBuilder.andWhere).toHaveBeenCalledTimes(Object.keys(filters).length);
 
             for (const [key, value] of Object.entries(filters)) {
@@ -221,6 +220,7 @@ describe('FlightExportService', () => {
         it('should return flight IDs and total count', async () => {
             const mockSelectQuery = {
                 select: jest.fn().mockReturnThis(),
+                distinct: jest.fn().mockReturnThis(),
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
@@ -253,6 +253,7 @@ describe('FlightExportService', () => {
         it('should throw if f_FlightID is missing in one or more DB rows', async () => {
             const mockSelectQuery = {
                 select: jest.fn().mockReturnThis(),
+                distinct: jest.fn().mockReturnThis(),
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
@@ -282,6 +283,7 @@ describe('FlightExportService', () => {
         it('should throw if t_FlightID is missing in one or more DB rows', async () => {
             const mockSelectQuery = {
                 select: jest.fn().mockReturnThis(),
+                distinct: jest.fn().mockReturnThis(),
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),

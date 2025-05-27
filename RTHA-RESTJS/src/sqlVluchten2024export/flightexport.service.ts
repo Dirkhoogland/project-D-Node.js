@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FlightExportEntity } from './entities/flightexport.entity';
-import { UserLogEntity } from 'src/sqlVluchten2024touchpoints/entities/userlog.entity';
+import { ExportLogEntity } from './entities/exportlog.entity';
 
 @Injectable()
 export class FlightExportService {
     constructor(
         @InjectRepository(FlightExportEntity)
         private flightExportRepository: Repository<FlightExportEntity>,
-        @InjectRepository(UserLogEntity)
-        private userLogRepository: Repository<UserLogEntity>,
+        @InjectRepository(ExportLogEntity)
+        private userLogRepository: Repository<ExportLogEntity>,
     ) { }
 
     async findWithFilters(
@@ -18,6 +18,10 @@ export class FlightExportService {
         limit = 50,
         offset = 0,
     ): Promise<{ data: FlightExportEntity[]; total: number }> {
+        if (limit < 0 || offset < 0) {
+            throw new BadRequestException('Limit and offset must be non-negative');
+        }
+
         const query = this.flightExportRepository.createQueryBuilder('f');
 
         Object.entries(filters).forEach(([key, value]) => {
@@ -25,7 +29,6 @@ export class FlightExportService {
                 query.andWhere(`f.${key} = :${key}`, { [key]: value });
             }
         });
-
 
         const [data, total] = await query
             .orderBy('f.id', 'ASC')
@@ -46,7 +49,7 @@ export class FlightExportService {
             .take(limit);
 
         const [results, total] = await Promise.all([
-            query.getRawMany(), // paginated data
+            query.getRawMany(),
             this.flightExportRepository
                 .createQueryBuilder('f')
                 .select('COUNT(DISTINCT f.FlightID)', 'count')
@@ -54,13 +57,23 @@ export class FlightExportService {
                 .then(res => Number(res.count)),
         ]);
 
-        const flightIDs = results.map((row) => row.f_FlightID);
+        const flightIDs = results.map((row) => {
+            const flightId = row.f_FlightID ?? row.t_FlightID;
+            if (flightId === undefined) {
+                throw new Error('Missing FlightID in DB result');
+            }
+            return flightId;
+        });
+
         return { flightIDs, total };
     }
 
-
-    async findOneById(FlightID: number): Promise<FlightExportEntity | null> {
-        return await this.flightExportRepository.findOne({ where: { FlightID } });
+    async findOneById(FlightID: number): Promise<FlightExportEntity> {
+        const result = await this.flightExportRepository.findOne({ where: { FlightID } });
+        if (!result) {
+            throw new NotFoundException('Flight not found');
+        }
+        return result;
     }
 
     async logUser(username: string, database: string, query: string, requestUrl: string, resultFound = false): Promise<void> {
@@ -79,3 +92,4 @@ export class FlightExportService {
         console.log(`Logged user: ${username} on database: ${database}`);
     }
 }
+

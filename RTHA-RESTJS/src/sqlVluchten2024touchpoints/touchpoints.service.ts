@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TouchpointEntity } from './entities/touchpoints.entity';
@@ -13,12 +13,15 @@ export class TouchpointService {
         private userLogRepository: Repository<UserLogEntity>,
     ) { }
 
-
     async findWithFilters(
         filters: Partial<TouchpointEntity>,
         limit = 50,
         offset = 0,
     ): Promise<{ data: TouchpointEntity[]; total: number }> {
+        if (limit < 0 || offset < 0) {
+            throw new BadRequestException('Limit and offset must be non-negative');
+        }
+
         const query = this.touchpointRepository.createQueryBuilder('t');
 
         Object.entries(filters).forEach(([key, value]) => {
@@ -36,7 +39,6 @@ export class TouchpointService {
         return { data, total };
     }
 
-
     async getAllFlightIDs(limit = 50, offset = 0): Promise<{ flightIDs: number[]; total: number }> {
         const query = this.touchpointRepository
             .createQueryBuilder('t')
@@ -47,21 +49,30 @@ export class TouchpointService {
             .take(limit);
 
         const [results, total] = await Promise.all([
-            query.getRawMany(), // paginated data
+            query.getRawMany(),
             this.touchpointRepository
                 .createQueryBuilder('t')
                 .select('COUNT(DISTINCT t.FlightID)', 'count')
                 .getRawOne()
-                .then(res => Number(res.count)),
+                .then((res) => Number(res.count)),
         ]);
 
-        const flightIDs = results.map((row) => row.t_FlightID);
+        const flightIDs = results.map((row) => {
+            if (row.t_FlightID === undefined) {
+                throw new Error('Missing FlightID in DB result');
+            }
+            return row.t_FlightID;
+        });
+
         return { flightIDs, total };
     }
 
-
-    async findOneById(FlightID: number): Promise<TouchpointEntity | null> {
-        return await this.touchpointRepository.findOne({ where: { FlightID } });
+    async findOneById(FlightID: number): Promise<TouchpointEntity> {
+        const result = await this.touchpointRepository.findOne({ where: { FlightID } });
+        if (!result) {
+            throw new NotFoundException('Touchpoint not found');
+        }
+        return result;
     }
 
     async logUser(username: string, database: string, query: string, requestUrl: string, resultFound = false): Promise<void> {
@@ -79,5 +90,4 @@ export class TouchpointService {
         await this.userLogRepository.save(logEntry);
         console.log(`Logged user: ${username} on database: ${database}`);
     }
-
 }

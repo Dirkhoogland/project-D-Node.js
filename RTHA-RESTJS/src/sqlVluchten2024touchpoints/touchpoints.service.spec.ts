@@ -212,6 +212,7 @@ describe('TouchpointService', () => {
         it('should return flight IDs and total count', async () => {
             const mockSelectQuery = {
                 select: jest.fn().mockReturnThis(),
+                distinct: jest.fn().mockReturnThis(),
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
@@ -247,6 +248,7 @@ describe('TouchpointService', () => {
         it('should throw if t_FlightID is missing in one or more DB rows', async () => {
             const mockSelectQuery = {
                 select: jest.fn().mockReturnThis(),
+                distinct: jest.fn().mockReturnThis(),
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
