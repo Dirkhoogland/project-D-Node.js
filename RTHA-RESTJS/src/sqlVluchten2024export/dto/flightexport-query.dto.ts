@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
     IsString,
     IsNumber,
@@ -29,10 +30,12 @@ export class FlightExportQueryDto {
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     Diverted?: boolean;
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     Nachtvlucht?: boolean;
 
     @ApiPropertyOptional()
@@ -49,6 +52,7 @@ export class FlightExportQueryDto {
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     PublicAnnouncement?: boolean;
 
     @ApiPropertyOptional()
@@ -81,6 +85,7 @@ export class FlightExportQueryDto {
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     Bus?: boolean;
 
     @ApiPropertyOptional()
@@ -133,10 +138,12 @@ export class FlightExportQueryDto {
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     EU?: boolean;
 
     @ApiPropertyOptional()
     @IsBoolean()
+    @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : value)
     Schengen?: boolean;
 
     @ApiPropertyOptional()
