@@ -13,10 +13,12 @@ export class FlightExportQueryDto {
     Type?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     FlightID?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TimetableID?: number;
 
@@ -39,6 +41,7 @@ export class FlightExportQueryDto {
     Nachtvlucht?: boolean;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     FlightCode?: number;
 
@@ -72,6 +75,7 @@ export class FlightExportQueryDto {
     ActualLocal?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Bewegingen?: number;
 
@@ -89,10 +93,12 @@ export class FlightExportQueryDto {
     Bus?: boolean;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Gate?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Bagageband?: number;
 
@@ -121,10 +127,12 @@ export class FlightExportQueryDto {
     AircraftRegistration?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Seats?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     MTOW?: number;
 
@@ -167,62 +175,77 @@ export class FlightExportQueryDto {
     Debiteur?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     DebiteurNr?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxMale?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxFemale?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxChild?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxInfant?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxTransitMale?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxTransitFemale?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxTransitChild?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxTransitInfant?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     CrewCabin?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     CrewCockpit?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     BagsWeight?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     BagsTransitWeight?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     BagsTransit?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Bags?: number;
 
@@ -231,14 +254,17 @@ export class FlightExportQueryDto {
     Afhandelaar?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     ForecastPercentage?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     ForecastPax?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     ForecastBabys?: number;
 
@@ -251,66 +277,82 @@ export class FlightExportQueryDto {
     Datasource?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalPax?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalPax?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalPaxBetalend?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalPaxBetalend?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TransitPax?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TransitPaxBetalend?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalCrew?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalCrew?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalSeats?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalSeats?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalBags?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalBags?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TransitBags?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TotaalBagsWeight?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TerminalBagsWeight?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TransitBagsWeight?: number;
 
@@ -319,18 +361,22 @@ export class FlightExportQueryDto {
     Runway?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Longitude?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Elevation?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Latitude?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     DistanceKilometers?: number;
 
@@ -347,6 +393,7 @@ export class FlightExportQueryDto {
     Forecast?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     Parked?: number;
 
@@ -359,10 +406,12 @@ export class FlightExportQueryDto {
     Feestdag?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     limit?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     offset?: number;
 }

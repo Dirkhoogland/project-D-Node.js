@@ -4,13 +4,16 @@ import {
     IsString,
     IsDateString,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class TouchpointQueryDto {
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     FlightID?: number;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TimetableID?: number;
 
@@ -43,6 +46,7 @@ export class TouchpointQueryDto {
     Country?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxForecast?: number;
 
@@ -55,6 +59,7 @@ export class TouchpointQueryDto {
     TouchpointTime?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     TouchpointPax?: number;
 
@@ -63,14 +68,17 @@ export class TouchpointQueryDto {
     ActualLocal?: string;
 
     @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     PaxActual?: number;
 
     @ApiPropertyOptional({ description: 'Aantal resultaten per pagina' })
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     limit?: number;
 
     @ApiPropertyOptional({ description: 'Aantal over te slaan resultaten (offset)' })
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     offset?: number;
 }
