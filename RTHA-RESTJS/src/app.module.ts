@@ -9,7 +9,9 @@ import { FlightExportModule } from './sqlVluchten2024export/flightexport.module'
 import { AppService } from './app.service';
 import { PasswordService } from './Passwords/pass';
 import { AuthModule } from './auth/auth.module';
-import { UserLogEntity } from './sqlVluchten2024touchpoints/entities/userlog.entity';
+import { UserLogEntity } from './logging/entities/userlog.entity';
+import { LoggingModule } from './logging/logging.module';
+
 
 import { join } from 'path';
 
@@ -24,6 +26,7 @@ PasswordService.init([TouchpointEntity, FlightExportEntity, UserLogEntity, Passw
     TouchpointModule,
     FlightExportModule,
     AuthModule,
+    LoggingModule
   ],
   controllers: [AppController],
   providers: [AppService],

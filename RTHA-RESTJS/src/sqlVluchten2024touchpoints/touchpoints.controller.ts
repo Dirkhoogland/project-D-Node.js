@@ -21,13 +21,16 @@ import { TouchpointService } from './touchpoints.service';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
 import { JsonWebTokenError } from '@nestjs/jwt';
+import { LoggingService } from 'src/logging/logging.service';
 
 const controllerName = 'touchpoints';
 
 @ApiTags('RTHA-API')
 @Controller(controllerName)
 export class TouchpointController {
-  constructor(private readonly touchpointService: TouchpointService) { }
+  constructor(private readonly touchpointService: TouchpointService,
+    private readonly loggingService: LoggingService,
+  ) { }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
@@ -71,14 +74,14 @@ export class TouchpointController {
       const { flightIDs, total } = await this.touchpointService.getAllFlightIDs(limit, offset);
 
       const urls = flightIDs.map(
-        (id) => `http://localhost:3000/${controllerName}/protected?FlightID=${id}`,
+        (id) => `${req.get('host')}/${controllerName}/protected?FlightID=${id}`,
       );
 
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
 
       const nextPageUrl = hasNextPage
-        ? `http://localhost:3000/${controllerName}/protected?limit=${limit}&offset=${nextOffset}`
+        ? `${req.get('host')}/${controllerName}/protected?limit=${limit}&offset=${nextOffset}`
         : null;
 
       return res.status(HttpStatus.OK).json({
@@ -93,7 +96,12 @@ export class TouchpointController {
       });
     }
 
-
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    const queryAsString = JSON.stringify(query);
+    // Gets the client ip (?)
+    const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+      ? req.headers['x-forwarded-for'].split(',')[0].trim()
+      : req.socket.remoteAddress || '';
 
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
@@ -102,11 +110,6 @@ export class TouchpointController {
         offset,
       );
 
-
-      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-      const queryAsString = JSON.stringify(query);
-      const resultFound = data && data.length > 0;
-      await this.touchpointService.logUser(user.username, 'Touchpoints', queryAsString, fullUrl, resultFound)
 
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
@@ -130,10 +133,15 @@ export class TouchpointController {
       });
 
       const nextPageUrl = hasNextPage
-        ? `http://localhost:3000/${controllerName}/protected?${queryParams.toString()}`
+        ? `${req.get('host')}/${controllerName}/protected?${queryParams.toString()}`
         : null;
 
       const plainList = data.map((item) => instanceToPlain(item));
+
+      const resultFound = data && data.length > 0;
+      const responseCode = HttpStatus.OK;
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
@@ -146,6 +154,7 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, false, 'GET', clientIP, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
       if (error instanceof JsonWebTokenError) {
         throw new Error(error.message)
       }
