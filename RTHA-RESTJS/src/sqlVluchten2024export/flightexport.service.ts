@@ -64,6 +64,7 @@ export class FlightExportService {
 
         return { flightIDs, total };
     }
+<<<<<<< HEAD
 
     async findOneById(FlightID: number): Promise<FlightExportEntity> {
         const result = await this.flightExportRepository.findOne({ where: { FlightID } });
@@ -73,6 +74,8 @@ export class FlightExportService {
         return result;
     }
 
+=======
+>>>>>>> main
 }
 
 

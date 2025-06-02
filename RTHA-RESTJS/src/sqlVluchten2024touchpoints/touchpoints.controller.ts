@@ -5,23 +5,18 @@ import {
   Param,
   Res,
   HttpStatus,
-  UseGuards,
-  NotFoundException,
-  Request,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
-import { Response } from 'express';
-import { instanceToPlain } from 'class-transformer';
-import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { TouchpointService } from './touchpoints.service';
+import { Response } from 'express';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
+<<<<<<< HEAD
 import { JsonWebTokenError } from '@nestjs/jwt';
 import { LoggingService } from 'src/logging/logging.service';
+=======
+import { instanceToPlain } from 'class-transformer';
+>>>>>>> main
 
 const controllerName = 'touchpoints';
 
@@ -32,9 +27,12 @@ export class TouchpointController {
     private readonly loggingService: LoggingService,
   ) { }
 
+<<<<<<< HEAD
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
 
+=======
+>>>>>>> main
   @Get()
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
@@ -42,12 +40,8 @@ export class TouchpointController {
   })
   async getFilteredTouchpoints(
     @Query() query: TouchpointQueryDto,
-    @Request() req,
     @Res() res: Response,
   ) {
-    const user = req.user;
-    console.log('Authenticated user:', user.username);
-
     const sanitizedFilters = Object.fromEntries(
       Object.entries(query).map(([key, value]) => [
         key,
@@ -59,6 +53,7 @@ export class TouchpointController {
 
     const { limit: rawLimit, offset: rawOffset, ...rawFilters } = sanitizedFilters;
 
+<<<<<<< HEAD
     const limit = Number.isNaN(Number(rawLimit)) ? 50 : Number(rawLimit);
     const offset = Number.isNaN(Number(rawOffset)) ? 0 : Number(rawOffset);
 
@@ -112,6 +107,8 @@ export class TouchpointController {
       ? req.headers['x-forwarded-for'].split(',')[0].trim()
       : req.socket.remoteAddress || '';
 
+=======
+>>>>>>> main
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
         filters,
@@ -119,7 +116,10 @@ export class TouchpointController {
         offset,
       );
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
           status_code: HttpStatus.NOT_FOUND,
@@ -163,6 +163,7 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
+<<<<<<< HEAD
       await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, false, 'GET', clientIP, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
       if (error instanceof JsonWebTokenError) {
         throw new Error(error.message)
@@ -170,6 +171,12 @@ export class TouchpointController {
       else {
         throw new Error('The server has encountered a problem: ' + error.message);
       }
+=======
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `The server has encountered a problem.`,
+      });
+>>>>>>> main
     }
   }
 

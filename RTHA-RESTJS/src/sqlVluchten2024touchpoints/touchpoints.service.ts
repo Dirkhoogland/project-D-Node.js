@@ -63,6 +63,7 @@ export class TouchpointService {
 
         return { flightIDs, total };
     }
+<<<<<<< HEAD
 
     async findOneById(FlightID: number): Promise<TouchpointEntity> {
         const result = await this.touchpointRepository.findOne({ where: { FlightID } });
@@ -72,4 +73,6 @@ export class TouchpointService {
         return result;
     }
 
+=======
+>>>>>>> main
 }
