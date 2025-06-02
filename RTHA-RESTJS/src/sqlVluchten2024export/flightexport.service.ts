@@ -23,10 +23,18 @@ export class FlightExportService {
 
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null && value !== '') {
-                query.andWhere(`f.${key} = :${key}`, { [key]: value });
+                if (key === 'DateTime') {
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(value as string)) {
+                        // Use a range for the whole day
+                        const start = `${value} 00:00:00`;
+                        const end = `${value} 23:59:59.999`;
+                        query.andWhere(`t.DateTime BETWEEN :start AND :end`, { start, end });
+                    } else {
+                        query.andWhere(`t.DateTime = :dateTime`, { dateTime: value });
+                    }
+                }
             }
         });
-
         const [data, total] = await query
             .orderBy('f.id', 'ASC')
             .skip(offset)
