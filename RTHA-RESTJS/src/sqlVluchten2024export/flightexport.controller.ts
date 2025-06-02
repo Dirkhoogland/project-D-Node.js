@@ -138,7 +138,7 @@ export class FlightExportController {
       const resultFound = data && data.length > 0;
       const responseCode = HttpStatus.OK;
 
-      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
+      this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,

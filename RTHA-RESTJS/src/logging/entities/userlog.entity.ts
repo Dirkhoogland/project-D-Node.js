@@ -30,8 +30,8 @@ export class UserLogEntity {
     @Column()
     clientIP: string;
 
-    @Column()
-    errorMessage: string | null;
+    @Column({ type: 'text', nullable: true })
+    errorMessage?: string;
 
     @Column()
     responseCode: number;
