@@ -34,6 +34,7 @@ export class FlightExportController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
   @Get()
+
   @ApiOperation({
     summary: 'Query SQL-Export database with flexible filters + pagination',
     description: 'Returns filtered data from SQL "Export" database.',
@@ -80,6 +81,16 @@ export class FlightExportController {
         ? `${req.get('host')}/${controllerName}?limit=${limit}&offset=${nextOffset}`
         : null;
 
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      // Gets the client ip (?)
+      const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+        ? req.headers['x-forwarded-for'].split(',')[0].trim()
+        : req.socket.remoteAddress || '';
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, true, 'GET', clientIP, undefined, HttpStatus.OK);
+
+
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
         message: 'Success! No filters provided, returning FlightID links.',
@@ -115,6 +126,7 @@ export class FlightExportController {
         });
       }
 
+
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
 
@@ -138,7 +150,7 @@ export class FlightExportController {
       const resultFound = data && data.length > 0;
       const responseCode = HttpStatus.OK;
 
-      this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,

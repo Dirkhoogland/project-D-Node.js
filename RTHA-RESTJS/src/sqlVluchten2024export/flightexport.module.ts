@@ -5,6 +5,7 @@ import { TouchpointModule } from 'src/sqlVluchten2024touchpoints/touchpoints.mod
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FlightExportEntity } from './entities/flightexport.entity';
 import { LoggingModule } from 'src/logging/logging.module';
+import { LoggingService } from 'src/logging/logging.service';
 
 @Module({
     imports: [

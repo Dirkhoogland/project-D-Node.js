@@ -84,6 +84,15 @@ export class TouchpointController {
         ? `${req.get('host')}/${controllerName}/protected?limit=${limit}&offset=${nextOffset}`
         : null;
 
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      // Gets the client ip (?)
+      const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+        ? req.headers['x-forwarded-for'].split(',')[0].trim()
+        : req.socket.remoteAddress || '';
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Touchpoints', queryAsString, fullUrl, true, 'GET', clientIP, undefined, HttpStatus.OK);
+
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
         message: 'Success! No filters provided, returning FlightID links.',

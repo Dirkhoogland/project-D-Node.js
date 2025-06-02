@@ -13,6 +13,9 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { UserLogDto } from './dto/logging-query.dto';
 import { LoggingService } from './logging.service';
 import { Response, Request } from 'express';
+import { Role } from 'src/auth/Roles/role.enum';
+import { Roles } from 'src/auth/Roles/role.decorator';
+import { RolesGuard } from 'src/auth/Roles/role.guard';
 
 const controllerName = 'logs';
 
@@ -22,7 +25,8 @@ export class LoggingController {
     constructor(private readonly loggingService: LoggingService) { }
 
     @Get()
-    @UseGuards(AuthGuard('jwt'))
+    @Roles(Role.ADMIN)
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
     @ApiBearerAuth('jwt')
     @ApiOperation({
         summary: 'Get user logs for the API',
