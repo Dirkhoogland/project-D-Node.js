@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
-@Entity('Exportlogs')
-export class ExportLogEntity {
+@Entity('Userlogs')
+export class UserLogEntity {
 
     @PrimaryGeneratedColumn()
     requestNo: bigint
@@ -23,5 +23,17 @@ export class ExportLogEntity {
 
     @Column()
     resultFound: boolean;
+
+    @Column()
+    httpMethod: string;
+
+    @Column()
+    clientIP: string;
+
+    @Column({ type: 'text', nullable: true })
+    errorMessage?: string;
+
+    @Column()
+    responseCode: number;
 
 }

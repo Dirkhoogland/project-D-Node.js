@@ -2,15 +2,12 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TouchpointEntity } from './entities/touchpoints.entity';
-import { UserLogEntity } from './entities/userlog.entity';
 
 @Injectable()
 export class TouchpointService {
     constructor(
         @InjectRepository(TouchpointEntity)
         private touchpointRepository: Repository<TouchpointEntity>,
-        @InjectRepository(UserLogEntity)
-        private userLogRepository: Repository<UserLogEntity>,
     ) { }
 
     async findWithFilters(
@@ -75,19 +72,4 @@ export class TouchpointService {
         return result;
     }
 
-    async logUser(username: string, database: string, query: string, requestUrl: string, resultFound = false): Promise<void> {
-        if (username === null || username === undefined) {
-            console.log('Username can not be null or undefined.');
-            return;
-        }
-        const logEntry = this.userLogRepository.create({
-            username,
-            database,
-            query,
-            requestUrl,
-            resultFound,
-        });
-        await this.userLogRepository.save(logEntry);
-        console.log(`Logged user: ${username} on database: ${database}`);
-    }
 }

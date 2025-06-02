@@ -2,15 +2,12 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FlightExportEntity } from './entities/flightexport.entity';
-import { ExportLogEntity } from './entities/exportlog.entity';
 
 @Injectable()
 export class FlightExportService {
     constructor(
         @InjectRepository(FlightExportEntity)
         private flightExportRepository: Repository<FlightExportEntity>,
-        @InjectRepository(ExportLogEntity)
-        private userLogRepository: Repository<ExportLogEntity>,
     ) { }
 
     async findWithFilters(
@@ -76,20 +73,6 @@ export class FlightExportService {
         return result;
     }
 
-    async logUser(username: string, database: string, query: string, requestUrl: string, resultFound = false): Promise<void> {
-        if (username === null || username === undefined) {
-            console.log('Username can not be null or undefined.');
-            return;
-        }
-        const logEntry = this.userLogRepository.create({
-            username,
-            database,
-            query,
-            requestUrl,
-            resultFound,
-        });
-        await this.userLogRepository.save(logEntry);
-        console.log(`Logged user: ${username} on database: ${database}`);
-    }
 }
+
 

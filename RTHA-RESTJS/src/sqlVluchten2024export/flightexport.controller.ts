@@ -18,6 +18,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { TouchpointService } from 'src/sqlVluchten2024touchpoints/touchpoints.service';
 import { Request } from 'express';
 import { Req } from '@nestjs/common'
+import { LoggingService } from 'src/logging/logging.service';
 
 const controllerName = 'flightExport';
 
@@ -27,11 +28,13 @@ export class FlightExportController {
   constructor(
     private readonly flightExportService: FlightExportService,
     private readonly touchpointService: TouchpointService,
+    private readonly loggingService: LoggingService,
   ) { }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
   @Get()
+
   @ApiOperation({
     summary: 'Query SQL-Export database with flexible filters + pagination',
     description: 'Returns filtered data from SQL "Export" database.',
@@ -67,15 +70,26 @@ export class FlightExportController {
       const { flightIDs, total } = await this.flightExportService.getAllFlightIDs(limit, offset);
 
       const urls = flightIDs.map(
-        (id) => `http://localhost:3000/${controllerName}?FlightID=${id}`,
+        (id) => `${req.get('host')}/${controllerName}?FlightID=${id}`,
+
       );
 
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
 
       const nextPageUrl = hasNextPage
-        ? `http://localhost:3000/${controllerName}?limit=${limit}&offset=${nextOffset}`
+        ? `${req.get('host')}/${controllerName}?limit=${limit}&offset=${nextOffset}`
         : null;
+
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      // Gets the client ip (?)
+      const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+        ? req.headers['x-forwarded-for'].split(',')[0].trim()
+        : req.socket.remoteAddress || '';
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, true, 'GET', clientIP, undefined, HttpStatus.OK);
+
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
@@ -89,6 +103,12 @@ export class FlightExportController {
       });
     }
 
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    const queryAsString = JSON.stringify(query);
+    // Gets the client ip (?)
+    const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+      ? req.headers['x-forwarded-for'].split(',')[0].trim()
+      : req.socket.remoteAddress || '';
 
     try {
       const { data, total } = await this.flightExportService.findWithFilters(
@@ -96,16 +116,6 @@ export class FlightExportController {
         limit,
         offset,
       );
-
-
-
-      // Log the user, what database the query was executed on, the query, the response url, if there are results and the datetime in the Userlogs table.
-
-      // ============== UNCOMMENT ================
-      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-      const queryAsString = JSON.stringify(query);
-      const resultFound = data && data.length > 0;
-      await this.touchpointService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound);
 
       //Checks if what findWithFilters returned is not empty/null, if it is we give return that nothing was found this the provided filters
 
@@ -115,6 +125,7 @@ export class FlightExportController {
           message: `No data found with provided filters.`,
         });
       }
+
 
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
@@ -131,10 +142,15 @@ export class FlightExportController {
       });
 
       const nextPageUrl = hasNextPage
-        ? `http://localhost:3000/${controllerName}?${queryParams.toString()}`
+        ? `${req.get('host')}/${controllerName}?${queryParams.toString()}`
         : null;
 
       const plainList = data.map((item) => instanceToPlain(item));
+
+      const resultFound = data && data.length > 0;
+      const responseCode = HttpStatus.OK;
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
@@ -147,6 +163,8 @@ export class FlightExportController {
         data: plainList,
       });
     } catch (error) {
+      console.log('BEFORE logUser');
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, false, 'GET', clientIP, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `The server has encountered a problem.`,

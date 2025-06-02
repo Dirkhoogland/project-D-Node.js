@@ -3,9 +3,11 @@ import { TouchpointController } from './touchpoints.controller';
 import { TouchpointService } from './touchpoints.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TouchpointEntity } from './entities/touchpoints.entity';
-import { UserLogEntity } from './entities/userlog.entity';
+import { LoggingModule } from 'src/logging/logging.module';
+import { LoggingService } from 'src/logging/logging.service';
+
 @Module({
-    imports: [TypeOrmModule.forFeature([TouchpointEntity, UserLogEntity])],
+    imports: [TypeOrmModule.forFeature([TouchpointEntity]), LoggingModule],
     controllers: [TouchpointController],
     providers: [TouchpointService],
     exports: [TouchpointService],
