@@ -11,15 +11,28 @@ import { TouchpointService } from './touchpoints.service';
 import { Response } from 'express';
 import { TouchpointQueryDto } from './dto/touchpoint-query.dto';
 import { Sanitizer } from 'src/overarching-funcs/sanitize-inputs';
+<<<<<<< HEAD
+import { JsonWebTokenError } from '@nestjs/jwt';
+import { LoggingService } from 'src/logging/logging.service';
+=======
 import { instanceToPlain } from 'class-transformer';
+>>>>>>> main
 
 const controllerName = 'touchpoints';
 
 @ApiTags('RTHA-API')
 @Controller(controllerName)
 export class TouchpointController {
-  constructor(private readonly touchpointService: TouchpointService) { }
+  constructor(private readonly touchpointService: TouchpointService,
+    private readonly loggingService: LoggingService,
+  ) { }
 
+<<<<<<< HEAD
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+
+=======
+>>>>>>> main
   @Get()
   @ApiOperation({
     summary: 'Query SQL-Touchpoints database with filters and pagination',
@@ -38,10 +51,64 @@ export class TouchpointController {
       ]),
     );
 
-    const limit = Number(sanitizedFilters.limit ?? 50);
-    const offset = Number(sanitizedFilters.offset ?? 0);
-    const { limit: _, offset: __, ...filters } = sanitizedFilters;
+    const { limit: rawLimit, offset: rawOffset, ...rawFilters } = sanitizedFilters;
 
+<<<<<<< HEAD
+    const limit = Number.isNaN(Number(rawLimit)) ? 50 : Number(rawLimit);
+    const offset = Number.isNaN(Number(rawOffset)) ? 0 : Number(rawOffset);
+
+    const filters = Object.fromEntries(
+      Object.entries(rawFilters).filter(
+        ([_, value]) => value !== undefined && value !== null && value !== '',
+      ),
+    );
+
+    const isEmpty = Object.keys(filters).length === 0;
+
+    if (isEmpty) {
+      const { flightIDs, total } = await this.touchpointService.getAllFlightIDs(limit, offset);
+
+      const urls = flightIDs.map(
+        (id) => `${req.get('host')}/${controllerName}/protected?FlightID=${id}`,
+      );
+
+      const nextOffset = offset + limit;
+      const hasNextPage = nextOffset < total;
+
+      const nextPageUrl = hasNextPage
+        ? `${req.get('host')}/${controllerName}/protected?limit=${limit}&offset=${nextOffset}`
+        : null;
+
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const queryAsString = JSON.stringify(query);
+      // Gets the client ip (?)
+      const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+        ? req.headers['x-forwarded-for'].split(',')[0].trim()
+        : req.socket.remoteAddress || '';
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Touchpoints', queryAsString, fullUrl, true, 'GET', clientIP, undefined, HttpStatus.OK);
+
+      return res.status(HttpStatus.OK).json({
+        status: HttpStatus.OK,
+        message: 'Success! No filters provided, returning FlightID links.',
+        name: 'RTHA-TOUCHPOINTS-API',
+        format: 'JSON',
+        total,
+        count: urls.length,
+        nextPage: nextPageUrl,
+        data: urls,
+      });
+    }
+
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    const queryAsString = JSON.stringify(query);
+    // Gets the client ip (?)
+    const clientIP = typeof req.headers['x-forwarded-for'] === 'string'
+      ? req.headers['x-forwarded-for'].split(',')[0].trim()
+      : req.socket.remoteAddress || '';
+
+=======
+>>>>>>> main
     try {
       const { data, total } = await this.touchpointService.findWithFilters(
         filters,
@@ -49,6 +116,10 @@ export class TouchpointController {
         offset,
       );
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> main
       if (!data || data.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
           status_code: HttpStatus.NOT_FOUND,
@@ -71,10 +142,15 @@ export class TouchpointController {
       });
 
       const nextPageUrl = hasNextPage
-        ? `http://localhost:3000/${controllerName}?${queryParams.toString()}`
+        ? `${req.get('host')}/${controllerName}/protected?${queryParams.toString()}`
         : null;
 
       const plainList = data.map((item) => instanceToPlain(item));
+
+      const resultFound = data && data.length > 0;
+      const responseCode = HttpStatus.OK;
+
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, resultFound, 'GET', clientIP, undefined, responseCode);
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
@@ -87,19 +163,34 @@ export class TouchpointController {
         data: plainList,
       });
     } catch (error) {
+<<<<<<< HEAD
+      await this.loggingService.logUser((req.user as any)?.username, 'Export', queryAsString, fullUrl, false, 'GET', clientIP, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof JsonWebTokenError) {
+        throw new Error(error.message)
+      }
+      else {
+        throw new Error('The server has encountered a problem: ' + error.message);
+      }
+=======
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `The server has encountered a problem.`,
       });
+>>>>>>> main
     }
   }
 
-  @Get(':FlightID')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
+  @Get('FlightID')
   @ApiOperation({
     summary: 'Get single touchpoint by FlightID',
     description: 'Returns a single row from SQL Touchpoints by FlightID',
   })
+
+
   async getById(@Param('FlightID') FlightID: string, @Res() res: Response) {
+
     const numericId = parseInt(FlightID, 10);
     if (isNaN(numericId)) {
       return res.status(HttpStatus.BAD_REQUEST).json({

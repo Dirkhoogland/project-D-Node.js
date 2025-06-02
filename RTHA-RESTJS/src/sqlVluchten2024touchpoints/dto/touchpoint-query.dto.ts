@@ -1,21 +1,84 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+    IsNumber,
+    IsString,
+    IsDateString,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class TouchpointQueryDto {
-    @ApiPropertyOptional() FlightID?: number;
-    @ApiPropertyOptional() TimetableID?: number;
-    @ApiPropertyOptional() FlightNumber?: string;
-    @ApiPropertyOptional() TrafficType?: string;
-    @ApiPropertyOptional() ScheduledLocal?: Date;
-    @ApiPropertyOptional() AirlineShortname?: string;
-    @ApiPropertyOptional() AircraftType?: string;
-    @ApiPropertyOptional() Airport?: string;
-    @ApiPropertyOptional() Country?: string;
-    @ApiPropertyOptional() PaxForecast?: number;
-    @ApiPropertyOptional() Touchpoint?: string;
-    @ApiPropertyOptional() TouchpointTime?: Date;
-    @ApiPropertyOptional() TouchpointPax?: number;
-    @ApiPropertyOptional() ActualLocal?: Date;
-    @ApiPropertyOptional() PaxActual?: number;
-    @ApiPropertyOptional({ description: 'Aantal resultaten per pagina' }) limit?: number;
-    @ApiPropertyOptional({ description: 'Aantal over te slaan resultaten (offset)' }) offset?: number;
+    @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    FlightID?: number;
+
+    @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    TimetableID?: number;
+
+    @ApiPropertyOptional()
+    @IsString()
+    FlightNumber?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    TrafficType?: string;
+
+    @ApiPropertyOptional()
+    @IsDateString()
+    ScheduledLocal?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    AirlineShortname?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    AircraftType?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    Airport?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    Country?: string;
+
+    @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    PaxForecast?: number;
+
+    @ApiPropertyOptional()
+    @IsString()
+    Touchpoint?: string;
+
+    @ApiPropertyOptional()
+    @IsDateString()
+    TouchpointTime?: string;
+
+    @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    TouchpointPax?: number;
+
+    @ApiPropertyOptional()
+    @IsDateString()
+    ActualLocal?: string;
+
+    @ApiPropertyOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    PaxActual?: number;
+
+    @ApiPropertyOptional({ description: 'Aantal resultaten per pagina' })
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    limit?: number;
+
+    @ApiPropertyOptional({ description: 'Aantal over te slaan resultaten (offset)' })
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
+    @IsNumber()
+    offset?: number;
 }
