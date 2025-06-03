@@ -21,19 +21,19 @@ export class TouchpointService {
 
         const query = this.touchpointRepository.createQueryBuilder('t');
 
-        // make it so you can search by date and datetime
         Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
-                if (key === 'DateTime') {
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(value as string)) {
-                        // Use a range for the whole day
-                        const start = `${value} 00:00:00`;
-                        const end = `${value} 23:59:59.999`;
-                        query.andWhere(`t.DateTime BETWEEN :start AND :end`, { start, end });
-                    } else {
-                        query.andWhere(`t.DateTime = :dateTime`, { dateTime: value });
-                    }
+            if (value instanceof Date) {
+                const isoString = value.toISOString();
+
+                if (isoString.endsWith('T00:00:00.000Z')) {
+                    const start = new Date(isoString);
+                    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+                    query.andWhere(`t.${key} BETWEEN :start AND :end`, { start, end });
+                } else {
+                    query.andWhere(`t.${key} = :${key}`, { [key]: value });
                 }
+            } else {
+                query.andWhere(`t.${key} = :${key}`, { [key]: value });
             }
         });
 

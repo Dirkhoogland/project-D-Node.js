@@ -133,7 +133,7 @@ export class TouchpointController {
       const queryParams = new URLSearchParams({
         ...Object.entries(query).reduce((acc, [key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            acc[key] = String(value);
+            acc[key] = value instanceof Date ? value.toISOString() : String(value);
           }
           return acc;
         }, {} as Record<string, string>),
