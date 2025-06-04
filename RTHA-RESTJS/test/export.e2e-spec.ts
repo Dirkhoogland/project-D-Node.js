@@ -72,13 +72,13 @@ describe('Auth & FlightExport E2E (read-only, live DB)', () => {
     expect(res.body.data).toBeInstanceOf(Array);
     expect(res.body.data.length).toBeGreaterThan(0);
 
-    const [id, url] = res.body.data[0];
+    const item = res.body.data[0];
 
-    expect(typeof id).toBe('number');
-    expect(typeof url).toBe('string');
-    expect(url).toContain(`FlightID=${id}`);
+    expect(typeof item.FlightID).toBe('number');
+    expect(typeof item.url).toBe('string');
+    expect(item.url).toContain(`FlightID=${item.FlightID}`);
 
-    testFlightID = id;
+    testFlightID = item.FlightID;
   });
 
   const booleanFilters = [
@@ -180,18 +180,18 @@ describe('Auth & FlightExport E2E (read-only, live DB)', () => {
   });
 
 
-  it('/flightExport/FlightID/:id - geldige ID werkt', async () => {
+  it('/flightExport/:id - geldige ID werkt', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/flightExport/FlightID/${testFlightID}`)
+      .get(`/flightExport/${testFlightID}`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(200);
 
     expect(res.body.data).toHaveProperty('FlightID', testFlightID);
   });
 
-  it('/flightExport/FlightID/:id - zonder token → 401', async () => {
+  it('/flightExport/:id - zonder token → 401', async () => {
     await request(app.getHttpServer())
-      .get(`/flightExport/FlightID/${testFlightID}`)
+      .get(`/flightExport/${testFlightID}`)
       .expect(401);
   });
 

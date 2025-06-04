@@ -69,10 +69,11 @@ export class FlightExportController {
     if (isEmpty) {
       const { flightIDs, total } = await this.flightExportService.getAllFlightIDs(limit, offset);
 
-      const urls = flightIDs.map(
-        (id) => `${req.get('host')}/${controllerName}?FlightID=${id}`,
+      const urls = flightIDs.map((id) => ({
+        FlightID: id,
+        url: `${req.protocol}://${req.get('host')}/${controllerName}?FlightID=${id}`,
+      }));
 
-      );
 
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
@@ -175,7 +176,7 @@ export class FlightExportController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
-  @Get('FlightID')
+  @Get(':FlightID')
   @ApiOperation({
     summary: 'Get a single flight export by FlightID',
     description: 'Returns one record from SQL "Export" database by FlightID.',
