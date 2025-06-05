@@ -22,6 +22,8 @@ export class FlightExportService {
         const query = this.flightExportRepository.createQueryBuilder('f');
 
         Object.entries(filters).forEach(([key, value]) => {
+            if (value === undefined || value === null || value === '') return;
+
             if (value instanceof Date) {
                 const isoString = value.toISOString();
 

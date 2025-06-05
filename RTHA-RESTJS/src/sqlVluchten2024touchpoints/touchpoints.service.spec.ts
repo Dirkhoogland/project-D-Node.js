@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TouchpointService } from './touchpoints.service';
 import { TouchpointEntity } from './entities/touchpoints.entity';
-import { UserLogEntity } from './entities/userlog.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,13 +17,6 @@ describe('TouchpointService', () => {
                     useValue: {
                         createQueryBuilder: jest.fn(),
                         findOne: jest.fn(),
-                    },
-                },
-                {
-                    provide: getRepositoryToken(UserLogEntity),
-                    useValue: {
-                        create: jest.fn(),
-                        save: jest.fn(),
                     },
                 },
             ],
