@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FlightExportService } from './flightexport.service';
-import { FlightExportEntity } from './entities/flightexport.entity';
+import { FlightExportService } from '../../src/sqlVluchten2024export/flightexport.service';
+import { FlightExportEntity } from '../../src/sqlVluchten2024export/entities/flightexport.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+// npx jest test/unit/flightexport.service.spec.ts
 
 describe('FlightExportService', () => {
     let service: FlightExportService;

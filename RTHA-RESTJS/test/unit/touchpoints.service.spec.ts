@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TouchpointService } from './touchpoints.service';
-import { TouchpointEntity } from './entities/touchpoints.entity';
+import { TouchpointService } from '../../src/sqlVluchten2024touchpoints/touchpoints.service';
+import { TouchpointEntity } from '../../src/sqlVluchten2024touchpoints/entities/touchpoints.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+// npx jest test/unit/touchpoints.service.spec.ts
 
 describe('TouchpointService', () => {
     let service: TouchpointService;

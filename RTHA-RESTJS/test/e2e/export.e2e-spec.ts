@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { RateLimitMiddleware } from '../src/middleware/rate-limit.middleware';
+import { AppModule } from 'src/app.module';
+import { RateLimitMiddleware } from 'src/middleware/rate-limit.middleware';
 
 describe('Auth & FlightExport E2E (read-only, live DB)', () => {
   let app: INestApplication;
