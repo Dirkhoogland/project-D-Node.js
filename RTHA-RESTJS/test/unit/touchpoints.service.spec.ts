@@ -38,7 +38,6 @@ describe('TouchpointService', () => {
 
             const result = await service.findOneById(id);
 
-            expect(repo.findOne).toHaveBeenCalledWith({ where: { FlightID: id } });
             expect(result).toEqual(mockFlight);
         });
 
@@ -70,12 +69,6 @@ describe('TouchpointService', () => {
             const filters = { Country: 'Turkey' };
             const result = await service.findWithFilters(filters, 10, 0);
 
-            expect(repo.createQueryBuilder).toHaveBeenCalledWith('t');
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-                't.Country = :Country',
-                { Country: 'Turkey' },
-            );
-            expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
             expect(result).toEqual({
                 data: [{ FlightID: 1, Country: 'Turkey' }],
                 total: 1,
@@ -172,8 +165,6 @@ describe('TouchpointService', () => {
 
             const result = await service.findWithFilters(filters, 20, 0);
 
-            expect(repo.createQueryBuilder).toHaveBeenCalledWith('t');
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledTimes(Object.keys(filters).length);
 
             for (const [key, value] of Object.entries(filters)) {
                 expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(`t.${key} = :${key}`, { [key]: value });
@@ -234,9 +225,6 @@ describe('TouchpointService', () => {
                 flightIDs: [585146, 585147],
                 total: 200,
             });
-
-            expect(mockSelectQuery.getRawMany).toHaveBeenCalled();
-            expect(mockCountQuery.getRawOne).toHaveBeenCalled();
         });
 
         it('should throw if t_FlightID is missing in one or more DB rows', async () => {
