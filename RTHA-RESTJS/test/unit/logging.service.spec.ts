@@ -3,7 +3,6 @@ import { LoggingService } from '../../src/logging/logging.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserLogEntity } from '../../src/logging/entities/userlog.entity';
 import { Repository } from 'typeorm';
-import { UserLogDto } from '../../src/logging/dto/logging-query.dto';
 
 describe('LoggingService', () => {
     let service: LoggingService;

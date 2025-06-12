@@ -1,5 +1,6 @@
 import { IsOptional, IsString, IsDateString, IsNumber } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class UserLogDto {
     @ApiPropertyOptional({ description: 'Username to filter logs by' })
@@ -18,7 +19,7 @@ export class UserLogDto {
     httpMethod?: string;
 
     @ApiPropertyOptional({ description: 'HTTP response code' })
-    @IsOptional()
+    @Transform(({ value }) => value !== undefined ? Number(value) : value)
     @IsNumber()
     responseCode?: number;
 
