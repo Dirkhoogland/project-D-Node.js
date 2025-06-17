@@ -31,7 +31,7 @@ export class AuthService {
   const newUser = this.passwordUsernameRepository.create({
     Username: username,
     Password: hashedPassword,
-    Role: role ?? Role.USER, // default only if role is missing
+    Role: role ?? Role.GUEST, // default only if role is missing
   });
   await this.passwordUsernameRepository.save(newUser);
 }

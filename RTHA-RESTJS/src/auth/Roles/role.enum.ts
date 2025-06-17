@@ -1,13 +1,12 @@
 export enum Role {
-  USER = 'user',
+  GUEST= 'guest',
   ADMIN = 'admin',
-  MODERATOR = 'moderator',
-  GUEST = 'guest'
+  EMPLOYEE = 'employee',
+
 }
 
 export const RoleLevel: Record<Role, number> = {
-  [Role.USER]: 3,
+  [Role.GUEST]: 3,
   [Role.ADMIN]: 1,
-  [Role.MODERATOR]: 2,
-  [Role.GUEST]: 4
+  [Role.EMPLOYEE]: 2,
 };

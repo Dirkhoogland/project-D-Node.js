@@ -13,7 +13,7 @@ export class PasswordUsername {
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.USER,
+    default: Role.GUEST,
     name: "Role"
   })
   Role: Role;
