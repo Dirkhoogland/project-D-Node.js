@@ -91,7 +91,7 @@ export class TouchpointController {
       const hasNextPage = nextOffset < total;
 
       const nextPageUrl = hasNextPage
-        ? `${req.get('host')}/${controllerName}/protected?limit=${limit}&offset=${nextOffset}`
+        ? `${req.get('host')}/${controllerName}?limit=${limit}&offset=${nextOffset}`
         : null;
 
       const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
