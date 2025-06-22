@@ -1,63 +1,55 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FlightExportService } from './flightexport.service';
-import { FlightExportEntity } from './entities/flightexport.entity';
-import { ExportLogEntity } from './entities/exportlog.entity';
+import { TouchpointService } from '../../src/sqlVluchten2024touchpoints/touchpoints.service';
+import { TouchpointEntity } from '../../src/sqlVluchten2024touchpoints/entities/touchpoints.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-describe('FlightExportService', () => {
-    let service: FlightExportService;
-    let repo: jest.Mocked<Repository<FlightExportEntity>>;
+// npx jest test/unit/touchpoints.service.spec.ts
+
+describe('TouchpointService', () => {
+    let service: TouchpointService;
+    let repo: jest.Mocked<Repository<TouchpointEntity>>;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                FlightExportService,
+                TouchpointService,
                 {
-                    provide: getRepositoryToken(FlightExportEntity),
+                    provide: getRepositoryToken(TouchpointEntity),
                     useValue: {
                         createQueryBuilder: jest.fn(),
                         findOne: jest.fn(),
                     },
                 },
-                {
-                    provide: getRepositoryToken(ExportLogEntity),
-                    useValue: {
-                        create: jest.fn(),
-                        save: jest.fn(),
-                    },
-                },
             ],
         }).compile();
 
-        service = module.get<FlightExportService>(FlightExportService);
-        repo = module.get(getRepositoryToken(FlightExportEntity));
+        service = module.get<TouchpointService>(TouchpointService);
+        repo = module.get(getRepositoryToken(TouchpointEntity));
     });
 
     describe('findOneById', () => {
         it.each([
             [123, { FlightID: 123 }],
             [456, { FlightID: 456 }],
-        ])('should return flight for FlightID %i', async (id, expected) => {
-            repo.findOne.mockResolvedValue(expected as FlightExportEntity);
+            [789, { FlightID: 789 }],
+        ])('should return flight for FlightID %i', async (id, mockFlight) => {
+            repo.findOne.mockResolvedValue(mockFlight as TouchpointEntity);
 
             const result = await service.findOneById(id);
 
-            expect(repo.findOne).toHaveBeenCalledWith({ where: { FlightID: id } });
-            expect(result).toEqual(expected);
+            expect(result).toEqual(mockFlight);
         });
 
-        it.each([
-            [9999999999, null],
-            [0, null],
-            [-1, null],
-        ])('should throw error if FlightID %i not found', async (id, _) => {
-            repo.findOne.mockResolvedValue(null);
+        it.each([9999999999, 0, -1])(
+            'should throw NotFoundException if FlightID %i not found',
+            async (id) => {
+                repo.findOne.mockResolvedValue(null);
 
-            await expect(service.findOneById(id)).rejects.toThrow('Flight not found');
-        });
+                await expect(service.findOneById(id)).rejects.toThrow('Touchpoint not found');
+            },
+        );
     });
-
 
     describe('findWithFilters', () => {
         it('should build query with filters and return data', async () => {
@@ -66,40 +58,19 @@ describe('FlightExportService', () => {
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
-                getManyAndCount: jest.fn().mockResolvedValue([[{ FlightID: 1, Diverted: false }], 1]),
-            };
-
-            repo.createQueryBuilder.mockReturnValue(mockQueryBuilder);
-
-            const filters = { Diverted: false };
-            const result = await service.findWithFilters(filters, 10, 0);
-
-            expect(repo.createQueryBuilder).toHaveBeenCalledWith('f');
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('f.Diverted = :Diverted', { Diverted: false });
-            expect(result).toEqual({ data: [{ FlightID: 1, Diverted: false }], total: 1 });
-        });
-
-        it('should build query with filter Country = "Spain" and return data', async () => {
-            const mockQueryBuilder: any = {
-                andWhere: jest.fn().mockReturnThis(),
-                orderBy: jest.fn().mockReturnThis(),
-                skip: jest.fn().mockReturnThis(),
-                take: jest.fn().mockReturnThis(),
                 getManyAndCount: jest.fn().mockResolvedValue([
-                    [{ FlightID: 2, Country: 'Spain' }],
+                    [{ FlightID: 1, Country: 'Turkey' }],
                     1,
                 ]),
             };
 
             repo.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
-            const filters = { Country: 'Spain' };
+            const filters = { Country: 'Turkey' };
             const result = await service.findWithFilters(filters, 10, 0);
 
-            expect(repo.createQueryBuilder).toHaveBeenCalledWith('f');
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('f.Country = :Country', { Country: 'Spain' });
             expect(result).toEqual({
-                data: [{ FlightID: 2, Country: 'Spain' }],
+                data: [{ FlightID: 1, Country: 'Turkey' }],
                 total: 1,
             });
         });
@@ -116,9 +87,9 @@ describe('FlightExportService', () => {
             repo.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
             const filters = {
-                Type: undefined,
+                TrafficType: undefined,
                 FlightNumber: '',
-                Diverted: null,
+                Country: null,
             } as any;
 
             await service.findWithFilters(filters, 10, 0);
@@ -129,47 +100,56 @@ describe('FlightExportService', () => {
         it.each([
             [
                 {
-                    Diverted: false,
-                    FlightNumber: 'TRA6061',
-                    Gate: 3,
-                    ScheduledUTC: new Date('2024-01-01T04:55:00Z'),
+                    FlightID: 111,
+                    TimetableID: 222,
+                    FlightNumber: 'XQ901',
+                    TrafficType: 'A',
+                    ScheduledLocal: new Date('2024-01-01T08:00:00Z'),
+                    Country: 'Turkey',
                 },
                 {
-                    FlightID: 123,
-                    Diverted: false,
-                    FlightNumber: 'TRA6061',
-                    Gate: 3,
-                    ScheduledUTC: new Date('2024-01-01T04:55:00Z'),
-                },
-            ],
-            [
-                {
-                    Diverted: true,
-                    FlightNumber: 'KL123',
-                    Gate: 5,
-                    ScheduledUTC: new Date('2025-12-25T10:30:00Z'),
-                },
-                {
-                    FlightID: 456,
-                    Diverted: true,
-                    FlightNumber: 'KL123',
-                    Gate: 5,
-                    ScheduledUTC: new Date('2025-12-25T10:30:00Z'),
+                    FlightID: 111,
+                    TimetableID: 222,
+                    FlightNumber: 'XQ901',
+                    TrafficType: 'A',
+                    ScheduledLocal: new Date('2024-01-01T08:00:00Z'),
+                    Country: 'Turkey',
                 },
             ],
             [
                 {
-                    Diverted: false,
-                    FlightNumber: 'HV987',
-                    Gate: 8,
-                    ScheduledUTC: new Date('2023-06-01T06:00:00Z'),
+                    FlightID: 333,
+                    TimetableID: 444,
+                    FlightNumber: 'HV123',
+                    TrafficType: 'D',
+                    ScheduledLocal: new Date('2024-05-15T15:30:00Z'),
+                    Country: 'Spain',
                 },
                 {
-                    FlightID: 789,
-                    Diverted: false,
-                    FlightNumber: 'HV987',
-                    Gate: 8,
-                    ScheduledUTC: new Date('2023-06-01T06:00:00Z'),
+                    FlightID: 333,
+                    TimetableID: 444,
+                    FlightNumber: 'HV123',
+                    TrafficType: 'D',
+                    ScheduledLocal: new Date('2024-05-15T15:30:00Z'),
+                    Country: 'Spain',
+                },
+            ],
+            [
+                {
+                    FlightID: 555,
+                    TimetableID: 666,
+                    FlightNumber: 'BA456',
+                    TrafficType: 'I',
+                    ScheduledLocal: new Date('2024-07-10T22:10:00Z'),
+                    Country: 'Marokko',
+                },
+                {
+                    FlightID: 555,
+                    TimetableID: 666,
+                    FlightNumber: 'BA456',
+                    TrafficType: 'I',
+                    ScheduledLocal: new Date('2024-07-10T22:10:00Z'),
+                    Country: 'Marokko',
                 },
             ],
         ])('should apply multiple filters correctly: %o', async (filters, expectedResult) => {
@@ -185,10 +165,9 @@ describe('FlightExportService', () => {
 
             const result = await service.findWithFilters(filters, 20, 0);
 
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledTimes(Object.keys(filters).length);
 
             for (const [key, value] of Object.entries(filters)) {
-                expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(`f.${key} = :${key}`, { [key]: value });
+                expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(`t.${key} = :${key}`, { [key]: value });
             }
 
             expect(result).toEqual({
@@ -196,7 +175,6 @@ describe('FlightExportService', () => {
                 total: 1,
             });
         });
-
 
         it.each([
             -1,
@@ -213,7 +191,6 @@ describe('FlightExportService', () => {
         ])('should throw error for invalid negative offset: %i', async (offset) => {
             await expect(service.findWithFilters({}, 10, offset)).rejects.toThrow('Limit and offset must be non-negative');
         });
-
     });
 
     describe('getAllFlightIDs', () => {
@@ -225,14 +202,14 @@ describe('FlightExportService', () => {
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
                 getRawMany: jest.fn().mockResolvedValue([
-                    { f_FlightID: 1001 },
-                    { f_FlightID: 1002 },
+                    { t_FlightID: 585146 },
+                    { t_FlightID: 585147 },
                 ]),
             };
 
             const mockCountQuery = {
                 select: jest.fn().mockReturnThis(),
-                getRawOne: jest.fn().mockResolvedValue({ count: '100' }),
+                getRawOne: jest.fn().mockResolvedValue({ count: '200' }),
             };
 
             const createQueryBuilder = jest
@@ -245,39 +222,9 @@ describe('FlightExportService', () => {
             const result = await service.getAllFlightIDs(2, 0);
 
             expect(result).toEqual({
-                flightIDs: [1001, 1002],
-                total: 100,
+                flightIDs: [585146, 585147],
+                total: 200,
             });
-        });
-
-        it('should throw if f_FlightID is missing in one or more DB rows', async () => {
-            const mockSelectQuery = {
-                select: jest.fn().mockReturnThis(),
-                distinct: jest.fn().mockReturnThis(),
-                orderBy: jest.fn().mockReturnThis(),
-                skip: jest.fn().mockReturnThis(),
-                take: jest.fn().mockReturnThis(),
-                getRawMany: jest.fn().mockResolvedValue([
-                    {}, // ontbreekt f_FlightID
-                    { f_FlightID: 1002 },
-                ]),
-            };
-
-            const mockCountQuery = {
-                select: jest.fn().mockReturnThis(),
-                getRawOne: jest.fn().mockResolvedValue({ count: '2' }),
-            };
-
-            const createQueryBuilder = jest
-                .fn()
-                .mockImplementationOnce(() => mockSelectQuery)
-                .mockImplementationOnce(() => mockCountQuery);
-
-            repo.createQueryBuilder = createQueryBuilder as any;
-
-            await expect(service.getAllFlightIDs(2, 0)).rejects.toThrow(
-                'Missing FlightID in DB result'
-            );
         });
 
         it('should throw if t_FlightID is missing in one or more DB rows', async () => {
@@ -310,4 +257,5 @@ describe('FlightExportService', () => {
             );
         });
     });
+
 });

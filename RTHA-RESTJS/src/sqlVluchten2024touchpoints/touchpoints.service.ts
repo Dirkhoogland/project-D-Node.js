@@ -22,7 +22,19 @@ export class TouchpointService {
         const query = this.touchpointRepository.createQueryBuilder('t');
 
         Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
+            if (value === undefined || value === null || value === '') return;
+
+            if (value instanceof Date) {
+                const isoString = value.toISOString();
+
+                if (isoString.endsWith('T00:00:00.000Z')) {
+                    const start = new Date(isoString);
+                    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+                    query.andWhere(`t.${key} BETWEEN :start AND :end`, { start, end });
+                } else {
+                    query.andWhere(`t.${key} = :${key}`, { [key]: value });
+                }
+            } else {
                 query.andWhere(`t.${key} = :${key}`, { [key]: value });
             }
         });

@@ -73,9 +73,19 @@ export class TouchpointController {
     if (isEmpty) {
       const { flightIDs, total } = await this.touchpointService.getAllFlightIDs(limit, offset);
 
-      const urls = flightIDs.map(
-        (id) => `${req.get('host')}/${controllerName}/protected?FlightID=${id}`,
+      const enriched = await Promise.all(
+        flightIDs.map(async (id) => {
+          const tp = await this.touchpointService.findOneById(id);
+          const scheduled = tp?.ScheduledLocal?.toISOString?.() || '';
+
+          return [
+            id,
+            scheduled,
+            `${req.protocol}://${req.get('host')}/${controllerName}?FlightID=${id}&ScheduledLocal=${encodeURIComponent(scheduled)}`,
+          ];
+        }),
       );
+
 
       const nextOffset = offset + limit;
       const hasNextPage = nextOffset < total;
@@ -95,13 +105,13 @@ export class TouchpointController {
 
       return res.status(HttpStatus.OK).json({
         status: HttpStatus.OK,
-        message: 'Success! No filters provided, returning FlightID links.',
+        message: 'Success! No filters provided, returning FlightID + ScheduledLocal + URL.',
         name: 'RTHA-TOUCHPOINTS-API',
         format: 'JSON',
         total,
-        count: urls.length,
+        count: enriched.length,
         nextPage: nextPageUrl,
-        data: urls,
+        data: enriched,
       });
     }
 
@@ -133,7 +143,7 @@ export class TouchpointController {
       const queryParams = new URLSearchParams({
         ...Object.entries(query).reduce((acc, [key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            acc[key] = String(value);
+            acc[key] = value instanceof Date ? value.toISOString() : String(value);
           }
           return acc;
         }, {} as Record<string, string>),
@@ -175,7 +185,7 @@ export class TouchpointController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('jwt')
-  @Get('FlightID')
+  @Get(':FlightID')
   @ApiOperation({
     summary: 'Get single touchpoint by FlightID',
     description: 'Returns a single row from SQL Touchpoints by FlightID',
